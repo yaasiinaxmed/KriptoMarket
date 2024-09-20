@@ -3,6 +3,7 @@ import { useQuery } from '@tanstack/react-query';
 import { Link } from 'react-router-dom';
 import { ArrowUpIcon, ArrowDownIcon, SearchIcon } from 'lucide-react';
 import { Skeleton } from "@/components/ui/skeleton";
+import CategoryFilter from '../components/CategoryFilter';
 
 const fetchAllAssets = async () => {
   const response = await fetch('https://api.coincap.io/v2/assets?limit=2000');
@@ -54,17 +55,36 @@ const SkeletonCard = () => (
   </div>
 );
 
+const getCategoryForAsset = (asset) => {
+  const name = asset.name.toLowerCase();
+  const symbol = asset.symbol.toLowerCase();
+
+  if (name.includes('doge') || name.includes('shib') || symbol.includes('pepe')) {
+    return 'meme';
+  } else if (name.includes('ai') || name.includes('artificial intelligence')) {
+    return 'ai';
+  } else if (['btc', 'eth', 'sol', 'ada', 'dot'].includes(symbol)) {
+    return 'layer1';
+  } else if (['matic', 'arb', 'op'].includes(symbol)) {
+    return 'layer2';
+  }
+  return 'all';
+};
+
 const Index = () => {
   const [searchTerm, setSearchTerm] = useState('');
+  const [activeCategory, setActiveCategory] = useState('all');
   const { data, isLoading, error } = useQuery({
     queryKey: ['allAssets'],
     queryFn: fetchAllAssets,
   });
 
-  const filteredAssets = isLoading ? [] : data.data.filter(asset =>
-    asset.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    asset.symbol.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const filteredAssets = isLoading ? [] : data.data
+    .filter(asset =>
+      (asset.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+       asset.symbol.toLowerCase().includes(searchTerm.toLowerCase())) &&
+      (activeCategory === 'all' || getCategoryForAsset(asset) === activeCategory)
+    );
 
   return (
     <div className="min-h-screen bg-gray-900 p-8">
@@ -81,6 +101,7 @@ const Index = () => {
           <SearchIcon className="absolute right-4 top-3 text-white" />
         </div>
       </div>
+      <CategoryFilter activeCategory={activeCategory} setActiveCategory={setActiveCategory} />
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
         {isLoading ? (
           Array(20).fill().map((_, index) => <SkeletonCard key={index} />)

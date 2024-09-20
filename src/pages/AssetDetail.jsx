@@ -33,8 +33,9 @@ const formatLargeNumber = (num) => {
 };
 
 const AssetDetailContent = ({ asset }) => (
-  <>
-    <div className="crypto-card mb-8 grid grid-cols-1 md:grid-cols-2 gap-8">
+  <div className='flex flex-col md:flex-row gap-8'>
+    <div className="flex flex-col gap-4 w-full md:w-[40%]">
+    <div className="crypto-card mb-8 grid grid-cols-1 gap-8">
       <div>
         <div className="flex items-center mb-4">
           <img
@@ -97,13 +98,14 @@ const AssetDetailContent = ({ asset }) => (
       <h2 className="text-2xl font-bold mb-4">About {asset.name}</h2>
       <p className="text-sm" dangerouslySetInnerHTML={{ __html: asset.description.en }}></p>
     </div>
-    <div className="crypto-card">
+    </div>
+    <div className="crypto-card w-full">
       <h2 className="text-2xl font-bold mb-4">Price Chart</h2>
-      <div className="tradingview-widget-container">
+      <div className="tradingview-widget-container h-full">
         <div id="tradingview_chart"></div>
       </div>
     </div>
-  </>
+  </div>
 );
 
 const AssetDetailSkeleton = () => (

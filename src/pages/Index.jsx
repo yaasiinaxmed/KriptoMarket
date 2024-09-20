@@ -4,60 +4,32 @@ import { SearchIcon } from 'lucide-react';
 import { Skeleton } from "@/components/ui/skeleton";
 import CategoryFilter from '../components/CategoryFilter';
 import CoinListItem from '../components/CoinListItem';
-
-const fetchAllAssets = async () => {
-  try {
-    const response = await fetch('https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=250&page=1&sparkline=false');
-    if (!response.ok) {
-      throw new Error('Network response was not ok');
-    }
-    return response.json();
-  } catch (error) {
-    console.error('Error fetching data:', error);
-    throw error;
-  }
-};
-
-const getCategoryForAsset = (asset) => {
-  const name = asset.name.toLowerCase();
-  const symbol = asset.symbol.toLowerCase();
-
-  if (name.includes('doge') || name.includes('shib') || symbol.includes('pepe') || symbol.includes('wif') || symbol.includes('floki') || symbol.includes('bonk') || symbol.includes('brett')) {
-    return 'meme';
-  } else if (name.includes('ai') || name.includes('artificial intelligence')) {
-    return 'ai';
-  } else if (['btc', 'eth', 'sol', 'ada', 'dot'].includes(symbol)) {
-    return 'layer1';
-  } else if (['matic', 'arb', 'op'].includes(symbol)) {
-    return 'layer2';
-  }
-  return 'all';
-};
-
-const SkeletonRow = () => (
-  <div className="grid grid-cols-4 md:grid-cols-5 lg:grid-cols-7 gap-2 md:gap-4 items-center py-2 md:py-4 px-2 md:px-4 border-b border-gray-700">
-    {[...Array(7)].map((_, index) => (
-      <Skeleton key={index} className={`h-6 w-full bg-gray-800 ${index > 3 && index < 6 ? 'hidden md:block' : ''} ${index === 6 ? 'hidden lg:block' : ''}`} />
-    ))}
-  </div>
-);
+import { fetchDexScreenerData, getCategoryForAsset } from '../utils/dexScreenerApi';
 
 const Index = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [activeCategory, setActiveCategory] = useState('all');
   const { data, isLoading, error } = useQuery({
-    queryKey: ['allAssets'],
-    queryFn: fetchAllAssets,
+    queryKey: ['dexScreenerAssets'],
+    queryFn: fetchDexScreenerData,
     refetchInterval: 60000,
   });
 
   const filteredAssets = data
     ? data.filter(asset =>
-        (asset.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-         asset.symbol.toLowerCase().includes(searchTerm.toLowerCase())) &&
+        (asset.baseToken.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+         asset.baseToken.symbol.toLowerCase().includes(searchTerm.toLowerCase())) &&
         (activeCategory === 'all' || getCategoryForAsset(asset) === activeCategory)
       )
     : [];
+
+  const SkeletonRow = () => (
+    <div className="grid grid-cols-4 md:grid-cols-5 lg:grid-cols-7 gap-2 md:gap-4 items-center py-2 md:py-4 px-2 md:px-4 border-b border-gray-700">
+      {[...Array(7)].map((_, index) => (
+        <Skeleton key={index} className={`h-6 w-full bg-gray-800 ${index > 3 && index < 6 ? 'hidden md:block' : ''} ${index === 6 ? 'hidden lg:block' : ''}`} />
+      ))}
+    </div>
+  );
 
   return (
     <div className="min-h-screen bg-gray-900 p-4 md:p-8">
@@ -81,16 +53,16 @@ const Index = () => {
             <div className="col-span-2">Name</div>
             <div className="text-right">Price</div>
             <div className="text-right">24h %</div>
-            <div className="text-right hidden md:block">Market Cap</div>
+            <div className="text-right hidden md:block">Liquidity</div>
             <div className="text-right hidden md:block">Volume(24h)</div>
-            <div className="text-right hidden lg:block">Circulating Supply</div>
+            <div className="text-right hidden lg:block">Chain</div>
           </div>
           {isLoading ? (
             Array(20).fill().map((_, index) => <SkeletonRow key={index} />)
           ) : error ? (
             <div className="col-span-full text-center text-xl md:text-2xl font-bold mt-10 text-red-600">Error: Unable to fetch data</div>
           ) : (
-            filteredAssets.map((asset) => <CoinListItem key={asset.id} asset={asset} />)
+            filteredAssets.map((asset) => <CoinListItem key={asset.pairAddress} asset={asset} />)
           )}
         </div>
       </div>

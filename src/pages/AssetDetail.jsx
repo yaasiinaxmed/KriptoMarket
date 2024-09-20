@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { ArrowLeftIcon, ArrowUpIcon, ArrowDownIcon, Globe, Twitter, Github, FileText, Copy, Check } from 'lucide-react';
@@ -6,33 +6,11 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 
-const fetchAssetData = async (id) => {
-  if (id === 'pumpfun' || id === 'sunpump') {
-    // Return mock data for custom coins
-    return {
-      id,
-      name: id === 'pumpfun' ? 'Pump Fun' : 'Sun Pump',
-      symbol: id,
-      image: { large: `https://example.com/${id}.png` },
-      market_data: {
-        current_price: { usd: id === 'pumpfun' ? 0.1 : 0.2 },
-        market_cap: { usd: id === 'pumpfun' ? 1000000 : 2000000 },
-        price_change_percentage_24h: id === 'pumpfun' ? 10 : 11,
-      },
-      links: {
-        homepage: ['https://example.com'],
-        twitter_screen_name: 'example',
-        repos_url: { github: ['https://github.com/example'] },
-        whitepaper: 'https://example.com/whitepaper.pdf',
-      },
-      description: { en: 'This is a mock description for the custom coin.' },
-      contract_address: '0x1234567890123456789012345678901234567890',
-    };
-  }
-
-  const response = await fetch(`https://api.coingecko.com/api/v3/coins/${id}?localization=false&tickers=false&market_data=true&community_data=true&developer_data=true&sparkline=true`);
+const fetchAssetData = async (pairAddress) => {
+  const response = await fetch(`https://api.dexscreener.com/latest/dex/pairs/${pairAddress}`);
   if (!response.ok) throw new Error('Network response was not ok');
-  return response.json();
+  const data = await response.json();
+  return data.pair;
 };
 
 const formatNumber = (num) => {
@@ -50,16 +28,16 @@ const formatLargeNumber = (num) => {
 const AssetInfo = ({ asset }) => (
   <div className="mb-6">
     <div className="flex items-center mb-4">
-      <img src={asset.image.large} alt={asset.name} className="w-12 h-12 mr-4" />
-      <h1 className="text-2xl md:text-4xl font-black">{asset.name} ({asset.symbol.toUpperCase()})</h1>
+      <img src={asset.baseToken.logoURI || 'https://via.placeholder.com/64'} alt={asset.baseToken.name} className="w-12 h-12 mr-4" />
+      <h1 className="text-2xl md:text-4xl font-black">{asset.baseToken.name} ({asset.baseToken.symbol.toUpperCase()})</h1>
     </div>
-    <p className="text-xl md:text-2xl font-bold mb-2">Price: {formatNumber(asset.market_data.current_price.usd)}</p>
-    <p className="text-lg md:text-xl mb-2">Market Cap: {formatLargeNumber(asset.market_data.market_cap.usd)}</p>
+    <p className="text-xl md:text-2xl font-bold mb-2">Price: {formatNumber(asset.priceUsd)}</p>
+    <p className="text-lg md:text-xl mb-2">Liquidity: {formatLargeNumber(asset.liquidity.usd)}</p>
     <p className="text-lg md:text-xl mb-2">
       24h Change: 
-      <span className={asset.market_data.price_change_percentage_24h > 0 ? 'text-green-500' : 'text-red-500'}>
-        {asset.market_data.price_change_percentage_24h > 0 ? <ArrowUpIcon className="inline w-4 h-4 mr-1" /> : <ArrowDownIcon className="inline w-4 h-4 mr-1" />}
-        {Math.abs(asset.market_data.price_change_percentage_24h).toFixed(2)}%
+      <span className={asset.priceChange.h24 >= 0 ? 'text-green-500' : 'text-red-500'}>
+        {asset.priceChange.h24 >= 0 ? <ArrowUpIcon className="inline w-4 h-4 mr-1" /> : <ArrowDownIcon className="inline w-4 h-4 mr-1" />}
+        {Math.abs(asset.priceChange.h24).toFixed(2)}%
       </span>
     </p>
   </div>
@@ -69,31 +47,10 @@ const AssetLinks = ({ asset }) => (
   <div className="mb-6">
     <h2 className="text-xl md:text-2xl font-bold mb-4">Links</h2>
     <div className="flex flex-wrap gap-4">
-      {asset.links.homepage[0] && (
+      {asset.url && (
         <Button variant="outline" asChild className="bg-gray-800 hover:bg-gray-700 text-white">
-          <a href={asset.links.homepage[0]} target="_blank" rel="noopener noreferrer">
+          <a href={asset.url} target="_blank" rel="noopener noreferrer">
             <Globe className="mr-2 h-4 w-4" /> Website
-          </a>
-        </Button>
-      )}
-      {asset.links.twitter_screen_name && (
-        <Button variant="outline" asChild className="bg-gray-800 hover:bg-gray-700 text-white">
-          <a href={`https://twitter.com/${asset.links.twitter_screen_name}`} target="_blank" rel="noopener noreferrer">
-            <Twitter className="mr-2 h-4 w-4" /> Twitter
-          </a>
-        </Button>
-      )}
-      {asset.links.repos_url.github[0] && (
-        <Button variant="outline" asChild className="bg-gray-800 hover:bg-gray-700 text-white">
-          <a href={asset.links.repos_url.github[0]} target="_blank" rel="noopener noreferrer">
-            <Github className="mr-2 h-4 w-4" /> GitHub
-          </a>
-        </Button>
-      )}
-      {asset.links.whitepaper && (
-        <Button variant="outline" asChild className="bg-gray-800 hover:bg-gray-700 text-white">
-          <a href={asset.links.whitepaper} target="_blank" rel="noopener noreferrer">
-            <FileText className="mr-2 h-4 w-4" /> Whitepaper
           </a>
         </Button>
       )}
@@ -102,7 +59,7 @@ const AssetLinks = ({ asset }) => (
 );
 
 const ContractAddress = ({ address }) => {
-  const [copied, setCopied] = useState(false);
+  const [copied, setCopied] = React.useState(false);
 
   const copyToClipboard = (text) => {
     navigator.clipboard.writeText(text).then(() => {
@@ -130,14 +87,7 @@ const ContractAddress = ({ address }) => {
   );
 };
 
-const AssetDescription = ({ description }) => (
-  <div className="mb-6">
-    <h2 className="text-xl md:text-2xl font-bold mb-4">About</h2>
-    <p className="text-sm md:text-base" dangerouslySetInnerHTML={{ __html: description }}></p>
-  </div>
-);
-
-const PriceChart = ({ symbol }) => (
+const PriceChart = ({ symbol, address }) => (
   <div className="h-full">
     <h2 className="text-xl md:text-2xl font-bold mb-4">Price Chart</h2>
     <div className="tradingview-widget-container h-[calc(100%-2rem)]">
@@ -152,14 +102,11 @@ const AssetDetailContent = ({ asset }) => (
       <div className="bg-gray-800 rounded-lg p-4 md:p-6">
         <AssetInfo asset={asset} />
         <AssetLinks asset={asset} />
-        {asset.contract_address && <ContractAddress address={asset.contract_address} />}
-      </div>
-      <div className="bg-gray-800 rounded-lg p-4 md:p-6">
-        <AssetDescription description={asset.description.en} />
+        <ContractAddress address={asset.pairAddress} />
       </div>
     </div>
     <div className="bg-gray-800 rounded-lg p-4 md:p-6 w-full lg:w-[60%] h-[400px] md:h-[600px] lg:h-auto">
-      <PriceChart symbol={asset.symbol} />
+      <PriceChart symbol={asset.baseToken.symbol} address={asset.pairAddress} />
     </div>
   </div>
 );
@@ -179,12 +126,6 @@ const AssetDetailSkeleton = () => (
           ))}
         </div>
       </div>
-      <div className="bg-gray-800 rounded-lg p-4 md:p-6">
-        <Skeleton className="h-8 w-1/3 mb-4 bg-gray-700" />
-        <Skeleton className="h-4 w-full mb-2 bg-gray-700" />
-        <Skeleton className="h-4 w-full mb-2 bg-gray-700" />
-        <Skeleton className="h-4 w-2/3 bg-gray-700" />
-      </div>
     </div>
     <div className="bg-gray-800 rounded-lg p-4 md:p-6 w-full lg:w-[60%] h-[400px] md:h-[600px] lg:h-auto">
       <Skeleton className="h-8 w-1/3 mb-4 bg-gray-700" />
@@ -201,7 +142,7 @@ const AssetDetail = () => {
     refetchInterval: 60000,
   });
 
-  useEffect(() => {
+  React.useEffect(() => {
     if (asset) {
       const script = document.createElement('script');
       script.src = 'https://s3.tradingview.com/tv.js';
@@ -209,7 +150,7 @@ const AssetDetail = () => {
       script.onload = () => {
         new window.TradingView.widget({
           autosize: true,
-          symbol: `${asset.symbol.toUpperCase()}USD`,
+          symbol: asset.pairAddress,
           interval: "D",
           timezone: "Etc/UTC",
           theme: "dark",

@@ -23,28 +23,27 @@ const CoinListItem = ({ asset }) => {
   };
 
   return (
-    <Link to={`/asset/${asset.id}`} className="block hover:bg-gray-800 transition-colors duration-200">
+    <Link to={`/asset/${asset.pairAddress}`} className="block hover:bg-gray-800 transition-colors duration-200">
       <div className="grid grid-cols-4 md:grid-cols-5 lg:grid-cols-7 gap-2 md:gap-4 items-center py-2 md:py-4 px-2 md:px-4 border-b border-gray-700 text-xs md:text-sm">
         <div className="col-span-2 flex items-center">
-          <span className="font-bold mr-2 w-6 md:w-8 text-right">{asset.market_cap_rank}</span>
           <img
-            src={asset.image}
-            alt={asset.name}
+            src={asset.baseToken.logoURI || 'https://via.placeholder.com/32'}
+            alt={asset.baseToken.name}
             className="w-5 h-5 md:w-6 md:h-6 mr-2"
           />
-          <span className="font-bold truncate">{asset.name}</span>
-          <span className="text-gray-400 ml-1 hidden md:inline">{asset.symbol.toUpperCase()}</span>
+          <span className="font-bold truncate">{asset.baseToken.name}</span>
+          <span className="text-gray-400 ml-1 hidden md:inline">{asset.baseToken.symbol.toUpperCase()}</span>
         </div>
-        <div className="text-right">{formatNumber(asset.current_price)}</div>
+        <div className="text-right">{formatNumber(asset.priceUsd)}</div>
         <div className="text-right">
-          <span className={asset.price_change_percentage_24h >= 0 ? 'text-green-500' : 'text-red-500'}>
-            {asset.price_change_percentage_24h >= 0 ? <ArrowUpIcon className="inline w-3 h-3 md:w-4 md:h-4 mr-1" /> : <ArrowDownIcon className="inline w-3 h-3 md:w-4 md:h-4 mr-1" />}
-            {Math.abs(asset.price_change_percentage_24h).toFixed(2)}%
+          <span className={asset.priceChange.h24 >= 0 ? 'text-green-500' : 'text-red-500'}>
+            {asset.priceChange.h24 >= 0 ? <ArrowUpIcon className="inline w-3 h-3 md:w-4 md:h-4 mr-1" /> : <ArrowDownIcon className="inline w-3 h-3 md:w-4 md:h-4 mr-1" />}
+            {Math.abs(asset.priceChange.h24).toFixed(2)}%
           </span>
         </div>
-        <div className="text-right hidden md:block">{formatLargeNumber(asset.market_cap)}</div>
-        <div className="text-right hidden md:block">{formatLargeNumber(asset.total_volume)}</div>
-        <div className="text-right hidden lg:block">{formatLargeNumber(asset.circulating_supply)} {asset.symbol.toUpperCase()}</div>
+        <div className="text-right hidden md:block">{formatLargeNumber(asset.liquidity.usd)}</div>
+        <div className="text-right hidden md:block">{formatLargeNumber(asset.volume.h24)}</div>
+        <div className="text-right hidden lg:block">{asset.chainId}</div>
       </div>
     </Link>
   );

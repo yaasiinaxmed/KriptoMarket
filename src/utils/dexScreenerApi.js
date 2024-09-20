@@ -1,0 +1,34 @@
+import { toast } from "sonner";
+
+const DEX_SCREENER_API_URL = 'https://api.dexscreener.com/latest/dex/tokens/';
+
+export const fetchDexScreenerData = async () => {
+  try {
+    const response = await fetch(`${DEX_SCREENER_API_URL}`);
+    if (!response.ok) {
+      throw new Error('Failed to fetch data from DexScreener');
+    }
+    const data = await response.json();
+    return data.pairs;
+  } catch (error) {
+    console.error('Error fetching DexScreener data:', error);
+    toast.error('Failed to fetch data from DexScreener');
+    return [];
+  }
+};
+
+export const getCategoryForAsset = (asset) => {
+  const name = asset.baseToken.name.toLowerCase();
+  const symbol = asset.baseToken.symbol.toLowerCase();
+
+  if (name.includes('doge') || name.includes('shib') || symbol.includes('pepe') || symbol.includes('wif') || symbol.includes('floki') || symbol.includes('bonk')) {
+    return 'meme';
+  } else if (name.includes('ai') || name.includes('artificial intelligence')) {
+    return 'ai';
+  } else if (['btc', 'eth', 'sol', 'ada', 'dot'].includes(symbol)) {
+    return 'layer1';
+  } else if (['matic', 'arb', 'op'].includes(symbol)) {
+    return 'layer2';
+  }
+  return 'other';
+};

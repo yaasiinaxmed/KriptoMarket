@@ -25,14 +25,14 @@ const formatLargeNumber = (num) => {
 };
 
 const AssetInfo = ({ asset }) => (
-  <div className="mb-4">
+  <div className="mb-6">
     <div className="flex items-center mb-4">
       <img src={asset.image.large} alt={asset.name} className="w-12 h-12 mr-4" />
-      <h1 className="text-4xl font-black">{asset.name} ({asset.symbol.toUpperCase()})</h1>
+      <h1 className="text-2xl md:text-4xl font-black">{asset.name} ({asset.symbol.toUpperCase()})</h1>
     </div>
-    <p className="text-2xl font-bold mb-2">Price: {formatNumber(asset.market_data.current_price.usd)}</p>
-    <p className="text-xl mb-2">Market Cap: {formatLargeNumber(asset.market_data.market_cap.usd)}</p>
-    <p className="text-xl mb-2">
+    <p className="text-xl md:text-2xl font-bold mb-2">Price: {formatNumber(asset.market_data.current_price.usd)}</p>
+    <p className="text-lg md:text-xl mb-2">Market Cap: {formatLargeNumber(asset.market_data.market_cap.usd)}</p>
+    <p className="text-lg md:text-xl mb-2">
       24h Change: 
       <span className={asset.market_data.price_change_percentage_24h > 0 ? 'text-green-500' : 'text-red-500'}>
         {asset.market_data.price_change_percentage_24h > 0 ? <ArrowUpIcon className="inline w-4 h-4 mr-1" /> : <ArrowDownIcon className="inline w-4 h-4 mr-1" />}
@@ -43,8 +43,8 @@ const AssetInfo = ({ asset }) => (
 );
 
 const AssetLinks = ({ asset }) => (
-  <div className="mb-4">
-    <h2 className="text-2xl font-bold mb-4">Links</h2>
+  <div className="mb-6">
+    <h2 className="text-xl md:text-2xl font-bold mb-4">Links</h2>
     <div className="flex flex-wrap gap-4">
       {asset.links.homepage[0] && (
         <Button variant="outline" asChild className="bg-gray-800 hover:bg-gray-700 text-white">
@@ -90,10 +90,10 @@ const ContractAddress = ({ address }) => {
   };
 
   return (
-    <div className="mt-4">
-      <h3 className="text-xl font-bold mb-2">Contract Address:</h3>
+    <div className="mt-6">
+      <h3 className="text-lg md:text-xl font-bold mb-2">Contract Address:</h3>
       <div className="flex items-center">
-        <p className="break-all mr-2">{address}</p>
+        <p className="break-all mr-2 text-sm md:text-base">{address}</p>
         <Button
           variant="outline"
           size="icon"
@@ -108,15 +108,15 @@ const ContractAddress = ({ address }) => {
 };
 
 const AssetDescription = ({ description }) => (
-  <div className="mb-8">
-    <h2 className="text-2xl font-bold mb-4">About</h2>
-    <p className="text-sm" dangerouslySetInnerHTML={{ __html: description }}></p>
+  <div className="mb-6">
+    <h2 className="text-xl md:text-2xl font-bold mb-4">About</h2>
+    <p className="text-sm md:text-base" dangerouslySetInnerHTML={{ __html: description }}></p>
   </div>
 );
 
 const PriceChart = ({ symbol }) => (
   <div className="h-full">
-    <h2 className="text-2xl font-bold mb-4">Price Chart</h2>
+    <h2 className="text-xl md:text-2xl font-bold mb-4">Price Chart</h2>
     <div className="tradingview-widget-container h-[calc(100%-2rem)]">
       <div id="tradingview_chart" className="h-full"></div>
     </div>
@@ -124,27 +124,27 @@ const PriceChart = ({ symbol }) => (
 );
 
 const AssetDetailContent = ({ asset }) => (
-  <div className='flex flex-col lg:flex-row gap-8'>
-    <div className="flex flex-col gap-4 w-full lg:w-[40%]">
-      <div className="bg-gray-800 rounded-lg p-6 mb-8">
+  <div className='flex flex-col lg:flex-row gap-6'>
+    <div className="flex flex-col gap-6 w-full lg:w-[40%]">
+      <div className="bg-gray-800 rounded-lg p-4 md:p-6">
         <AssetInfo asset={asset} />
         <AssetLinks asset={asset} />
         {asset.contract_address && <ContractAddress address={asset.contract_address} />}
       </div>
-      <div className="bg-gray-800 rounded-lg p-6 mb-8">
+      <div className="bg-gray-800 rounded-lg p-4 md:p-6">
         <AssetDescription description={asset.description.en} />
       </div>
     </div>
-    <div className="bg-gray-800 rounded-lg p-6 w-full lg:w-[60%] h-[600px] lg:h-auto">
+    <div className="bg-gray-800 rounded-lg p-4 md:p-6 w-full lg:w-[60%] h-[400px] md:h-[600px] lg:h-auto">
       <PriceChart symbol={asset.symbol} />
     </div>
   </div>
 );
 
 const AssetDetailSkeleton = () => (
-  <div className='flex flex-col lg:flex-row gap-8'>
-    <div className="flex flex-col gap-4 w-full lg:w-[40%]">
-      <div className="bg-gray-800 rounded-lg p-6 mb-8">
+  <div className='flex flex-col lg:flex-row gap-6'>
+    <div className="flex flex-col gap-6 w-full lg:w-[40%]">
+      <div className="bg-gray-800 rounded-lg p-4 md:p-6">
         <Skeleton className="h-12 w-3/4 mb-4 bg-gray-700" />
         <Skeleton className="h-6 w-1/2 mb-2 bg-gray-700" />
         <Skeleton className="h-6 w-2/3 mb-2 bg-gray-700" />
@@ -156,14 +156,14 @@ const AssetDetailSkeleton = () => (
           ))}
         </div>
       </div>
-      <div className="bg-gray-800 rounded-lg p-6 mb-8">
+      <div className="bg-gray-800 rounded-lg p-4 md:p-6">
         <Skeleton className="h-8 w-1/3 mb-4 bg-gray-700" />
         <Skeleton className="h-4 w-full mb-2 bg-gray-700" />
         <Skeleton className="h-4 w-full mb-2 bg-gray-700" />
         <Skeleton className="h-4 w-2/3 bg-gray-700" />
       </div>
     </div>
-    <div className="bg-gray-800 rounded-lg p-6 w-full lg:w-[60%] h-[600px] lg:h-auto">
+    <div className="bg-gray-800 rounded-lg p-4 md:p-6 w-full lg:w-[60%] h-[400px] md:h-[600px] lg:h-auto">
       <Skeleton className="h-8 w-1/3 mb-4 bg-gray-700" />
       <Skeleton className="w-full h-[calc(100%-2rem)] bg-gray-700" />
     </div>
@@ -206,14 +206,14 @@ const AssetDetail = () => {
   }, [asset]);
 
   return (
-    <div className="min-h-screen bg-gray-900 p-4 md:p-8">
+    <div className="min-h-screen bg-gray-900 p-4 md:p-6 lg:p-8">
       <Link to="/" className="inline-flex items-center text-white mb-6 hover:underline">
         <ArrowLeftIcon className="mr-2" /> Back to list
       </Link>
       {isLoading ? (
         <AssetDetailSkeleton />
       ) : error ? (
-        <div className="text-center text-2xl font-bold mt-10 text-red-600">Error: {error.message}</div>
+        <div className="text-center text-xl md:text-2xl font-bold mt-10 text-red-600">Error: {error.message}</div>
       ) : (
         <AssetDetailContent asset={asset} />
       )}

@@ -16,7 +16,7 @@ const fetchAllAssets = async () => {
 const SkeletonRow = () => (
   <div className="grid grid-cols-4 md:grid-cols-5 lg:grid-cols-7 gap-2 md:gap-4 items-center py-2 md:py-4 px-2 md:px-4 border-b border-gray-700">
     {[...Array(7)].map((_, index) => (
-      <Skeleton key={index} className={`h-6 w-full ${index > 3 && index < 6 ? 'hidden md:block' : ''} ${index === 6 ? 'hidden lg:block' : ''}`} />
+      <Skeleton key={index} className={`h-6 w-full bg-gray-800 ${index > 3 && index < 6 ? 'hidden md:block' : ''} ${index === 6 ? 'hidden lg:block' : ''}`} />
     ))}
   </div>
 );

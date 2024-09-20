@@ -6,80 +6,46 @@ import CategoryFilter from '../components/CategoryFilter';
 import CoinListItem from '../components/CoinListItem';
 
 const fetchAllAssets = async () => {
-  const response = await fetch('https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=250&page=1&sparkline=false');
-  if (!response.ok) {
-    throw new Error('Network response was not ok');
-  }
-  const data = await response.json();
+  const [coingeckoData, pumpfunData, sunpumpData] = await Promise.all([
+    fetch('https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=250&page=1&sparkline=false').then(res => res.json()),
+    fetch('https://api.pumpfun.com/coins').then(res => res.json()),
+    fetch('https://api.sunpump.com/coins').then(res => res.json())
+  ]);
 
-  // Add custom coins
-  const customCoins = [
-    {
-      id: 'pumpfun',
-      symbol: 'pumpfun',
-      name: 'Pump Fun',
-      image: 'https://example.com/pumpfun.png',
-      current_price: 0.1,
-      market_cap: 1000000,
-      market_cap_rank: null,
-      fully_diluted_valuation: 1000000,
-      total_volume: 100000,
-      high_24h: 0.11,
-      low_24h: 0.09,
-      price_change_24h: 0.01,
-      price_change_percentage_24h: 10,
-      market_cap_change_24h: 100000,
-      market_cap_change_percentage_24h: 10,
-      circulating_supply: 10000000,
-      total_supply: 100000000,
-      max_supply: 100000000,
-      ath: 0.15,
-      ath_change_percentage: -33.33,
-      ath_date: "2023-01-01T00:00:00.000Z",
-      atl: 0.05,
-      atl_change_percentage: 100,
-      atl_date: "2022-01-01T00:00:00.000Z",
-      roi: null,
-      last_updated: "2023-04-30T00:00:00.000Z"
-    },
-    {
-      id: 'sunpump',
-      symbol: 'sunpump',
-      name: 'Sun Pump',
-      image: 'https://example.com/sunpump.png',
-      current_price: 0.2,
-      market_cap: 2000000,
-      market_cap_rank: null,
-      fully_diluted_valuation: 2000000,
-      total_volume: 200000,
-      high_24h: 0.22,
-      low_24h: 0.18,
-      price_change_24h: 0.02,
-      price_change_percentage_24h: 11,
-      market_cap_change_24h: 200000,
-      market_cap_change_percentage_24h: 11,
-      circulating_supply: 10000000,
-      total_supply: 100000000,
-      max_supply: 100000000,
-      ath: 0.25,
-      ath_change_percentage: -20,
-      ath_date: "2023-02-01T00:00:00.000Z",
-      atl: 0.1,
-      atl_change_percentage: 100,
-      atl_date: "2022-02-01T00:00:00.000Z",
-      roi: null,
-      last_updated: "2023-04-30T00:00:00.000Z"
-    }
-  ];
+  const pumpfunCoins = pumpfunData.map(coin => ({
+    ...coin,
+    id: `pumpfun_${coin.id}`,
+    name: `${coin.name} (Pump Fun)`,
+    image: coin.logo_url,
+    current_price: coin.price,
+    market_cap: coin.market_cap,
+    price_change_percentage_24h: coin.price_change_percentage_24h,
+    total_volume: coin.volume_24h,
+    circulating_supply: coin.circulating_supply
+  }));
 
-  return [...data, ...customCoins];
+  const sunpumpCoins = sunpumpData.map(coin => ({
+    ...coin,
+    id: `sunpump_${coin.id}`,
+    name: `${coin.name} (Sun Pump)`,
+    image: coin.logo_url,
+    current_price: coin.price,
+    market_cap: coin.market_cap,
+    price_change_percentage_24h: coin.price_change_percentage_24h,
+    total_volume: coin.volume_24h,
+    circulating_supply: coin.circulating_supply
+  }));
+
+  return [...coingeckoData, ...pumpfunCoins, ...sunpumpCoins];
 };
 
 const getCategoryForAsset = (asset) => {
   const name = asset.name.toLowerCase();
   const symbol = asset.symbol.toLowerCase();
 
-  if (name.includes('doge') || name.includes('shib') || symbol.includes('pepe') || symbol.includes('wif') || symbol.includes('floki') || symbol.includes('bonk') || symbol.includes('brett') || name === 'pump fun' || name === 'sun pump') {
+  if (name.includes('pump fun') || name.includes('sun pump')) {
+    return 'custom';
+  } else if (name.includes('doge') || name.includes('shib') || symbol.includes('pepe') || symbol.includes('wif') || symbol.includes('floki') || symbol.includes('bonk') || symbol.includes('brett')) {
     return 'meme';
   } else if (name.includes('ai') || name.includes('artificial intelligence')) {
     return 'ai';

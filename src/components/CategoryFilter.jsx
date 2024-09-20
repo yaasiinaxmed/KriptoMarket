@@ -7,6 +7,7 @@ const categories = [
   { name: 'AI', key: 'ai' },
   { name: 'Layer 1', key: 'layer1' },
   { name: 'Layer 2', key: 'layer2' },
+  { name: 'Custom', key: 'custom' },
 ];
 
 const CategoryFilter = ({ activeCategory, setActiveCategory }) => {

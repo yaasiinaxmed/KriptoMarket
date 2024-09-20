@@ -6,10 +6,10 @@ export const fetchDexScreenerData = async () => {
   try {
     const response = await fetch(`${DEX_SCREENER_API_URL}?q=*`);
     if (!response.ok) {
-      throw new Error('Failed to fetch data from DexScreener');
+      throw new Error(`HTTP error! status: ${response.status}`);
     }
     const data = await response.json();
-    return data.pairs;
+    return data.pairs || [];
   } catch (error) {
     console.error('Error fetching DexScreener data:', error);
     toast.error('Failed to fetch data from DexScreener');

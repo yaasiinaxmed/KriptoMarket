@@ -22,27 +22,26 @@ const CoinListItem = ({ asset, rank }) => {
   return (
     <Link to={`/asset/${asset.id}`} className="block hover:bg-gray-800 transition-colors duration-200">
       <div className="grid grid-cols-8 items-center py-4 px-2 border-b border-gray-700 text-sm">
-        <div className="col-span-1 text-center">{rank}</div>
+        <div className="col-span-1 text-center">{asset.market_cap_rank}</div>
         <div className="col-span-2 flex items-center">
           <img
-            src={`https://assets.coincap.io/assets/icons/${asset.symbol.toLowerCase()}@2x.png`}
+            src={asset.image}
             alt={asset.name}
             className="w-6 h-6 mr-2"
-            onError={(e) => { e.target.onerror = null; e.target.src = 'https://assets.coincap.io/assets/icons/btc@2x.png' }}
           />
           <span className="font-bold">{asset.name}</span>
-          <span className="text-gray-400 ml-2">{asset.symbol}</span>
+          <span className="text-gray-400 ml-2">{asset.symbol.toUpperCase()}</span>
         </div>
-        <div className="col-span-1 text-right">{formatNumber(parseFloat(asset.priceUsd))}</div>
+        <div className="col-span-1 text-right">{formatNumber(asset.current_price)}</div>
         <div className="col-span-1 text-right">
-          <span className={parseFloat(asset.changePercent24Hr) >= 0 ? 'text-green-500' : 'text-red-500'}>
-            {parseFloat(asset.changePercent24Hr) >= 0 ? <ArrowUpIcon className="inline w-4 h-4 mr-1" /> : <ArrowDownIcon className="inline w-4 h-4 mr-1" />}
-            {Math.abs(parseFloat(asset.changePercent24Hr)).toFixed(2)}%
+          <span className={asset.price_change_percentage_24h >= 0 ? 'text-green-500' : 'text-red-500'}>
+            {asset.price_change_percentage_24h >= 0 ? <ArrowUpIcon className="inline w-4 h-4 mr-1" /> : <ArrowDownIcon className="inline w-4 h-4 mr-1" />}
+            {Math.abs(asset.price_change_percentage_24h).toFixed(2)}%
           </span>
         </div>
-        <div className="col-span-1 text-right">{formatLargeNumber(parseFloat(asset.marketCapUsd))}</div>
-        <div className="col-span-1 text-right">{formatLargeNumber(parseFloat(asset.volumeUsd24Hr))}</div>
-        <div className="col-span-1 text-right">{formatLargeNumber(parseFloat(asset.supply))}</div>
+        <div className="col-span-1 text-right">{formatLargeNumber(asset.market_cap)}</div>
+        <div className="col-span-1 text-right">{formatLargeNumber(asset.total_volume)}</div>
+        <div className="col-span-1 text-right">{formatLargeNumber(asset.circulating_supply)} {asset.symbol.toUpperCase()}</div>
       </div>
     </Link>
   );

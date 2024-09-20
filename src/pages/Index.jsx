@@ -6,7 +6,7 @@ import CategoryFilter from '../components/CategoryFilter';
 import CoinListItem from '../components/CoinListItem';
 
 const fetchAllAssets = async () => {
-  const response = await fetch('https://api.coincap.io/v2/assets?limit=2000');
+  const response = await fetch('https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=250&page=1&sparkline=false');
   if (!response.ok) {
     throw new Error('Network response was not ok');
   }
@@ -45,7 +45,7 @@ const Index = () => {
     queryFn: fetchAllAssets,
   });
 
-  const filteredAssets = isLoading ? [] : data.data
+  const filteredAssets = isLoading ? [] : data
     .filter(asset =>
       (asset.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
        asset.symbol.toLowerCase().includes(searchTerm.toLowerCase())) &&
@@ -90,7 +90,7 @@ const Index = () => {
       </div>
       {!isLoading && !error && (
         <p className="text-center mt-8 text-xl">
-          Displaying {filteredAssets.length} out of {data.data.length} cryptocurrencies
+          Displaying {filteredAssets.length} out of {data.length} cryptocurrencies
         </p>
       )}
     </div>

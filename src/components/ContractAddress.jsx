@@ -17,12 +17,12 @@ const ContractAddress = ({ address }) => {
   return (
     <div className="mt-4">
       <h3 className="text-lg font-bold mb-2">Contract Address:</h3>
-      <div className="flex items-center bg-gray-700 p-2 rounded">
+      <div className="flex items-center bg-gray-800 p-2 rounded">
         <p className="break-all mr-2 text-sm flex-grow">{address}</p>
         <Button
           variant="ghost"
           size="icon"
-          className="text-white hover:bg-gray-600"
+          className="text-white hover:bg-gray-700"
           onClick={() => copyToClipboard(address)}
         >
           {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}

@@ -5,6 +5,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import CategoryFilter from '../components/CategoryFilter';
 import CoinListItem from '../components/CoinListItem';
 import { toast } from "sonner";
+import Layout from '../components/Layout';
 
 const fetchAllAssets = async () => {
   try {
@@ -65,8 +66,7 @@ const Index = () => {
     : [];
 
   return (
-    <div className="min-h-screen bg-gray-900 p-4 md:p-8">
-      <h1 className="text-3xl md:text-5xl text-white mb-6 md:mb-8 text-center p-2 md:p-4">KriptoMarket</h1>
+    <Layout>
       <div className="mb-4 md:mb-6 flex justify-center">
         <div className="relative w-full md:w-96">
           <input
@@ -74,7 +74,7 @@ const Index = () => {
             placeholder="Search cryptocurrencies..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full px-4 py-2 rounded-full bg-gray-800 text-white border-2 md:border-4 border-white focus:outline-none"
+            className="w-full px-4 py-2 rounded-full bg-gray-800 text-white border-2 border-gray-700 focus:outline-none focus:border-white"
           />
           <SearchIcon className="absolute right-4 top-3 text-white" />
         </div>
@@ -112,7 +112,7 @@ const Index = () => {
           Displaying {filteredAssets.length} out of {data ? data.length : 0} cryptocurrencies
         </p>
       )}
-    </div>
+    </Layout>
   );
 };
 

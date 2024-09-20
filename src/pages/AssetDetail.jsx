@@ -8,6 +8,7 @@ import AssetLinks from '../components/AssetLinks';
 import ContractAddress from '../components/ContractAddress';
 import AssetDescription from '../components/AssetDescription';
 import PriceChart from '../components/PriceChart';
+import Layout from '../components/Layout';
 
 const fetchAssetData = async (id) => {
   const response = await fetch(`https://api.coingecko.com/api/v3/coins/${id}?localization=false&tickers=false&market_data=true&community_data=true&developer_data=true&sparkline=true`);
@@ -98,7 +99,7 @@ const AssetDetail = () => {
   }, [asset]);
 
   return (
-    <div className="min-h-screen bg-gray-900 p-4 md:p-6 lg:p-8">
+    <Layout>
       <Link to="/" className="inline-flex items-center text-white mb-6 hover:underline">
         <ArrowLeftIcon className="mr-2" /> Back to list
       </Link>
@@ -109,7 +110,7 @@ const AssetDetail = () => {
       ) : (
         <AssetDetailContent asset={asset} />
       )}
-    </div>
+    </Layout>
   );
 };
 

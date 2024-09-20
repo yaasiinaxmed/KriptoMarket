@@ -1,10 +1,10 @@
 import { toast } from "sonner";
 
-const DEX_SCREENER_API_URL = 'https://api.dexscreener.com/latest/dex/tokens/';
+const DEX_SCREENER_API_URL = 'https://api.dexscreener.com/latest/dex/search';
 
 export const fetchDexScreenerData = async () => {
   try {
-    const response = await fetch(`${DEX_SCREENER_API_URL}`);
+    const response = await fetch(`${DEX_SCREENER_API_URL}?q=*`);
     if (!response.ok) {
       throw new Error('Failed to fetch data from DexScreener');
     }
@@ -18,6 +18,8 @@ export const fetchDexScreenerData = async () => {
 };
 
 export const getCategoryForAsset = (asset) => {
+  if (!asset || !asset.baseToken) return 'other';
+  
   const name = asset.baseToken.name.toLowerCase();
   const symbol = asset.baseToken.symbol.toLowerCase();
 

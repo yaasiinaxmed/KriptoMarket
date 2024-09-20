@@ -4,6 +4,7 @@ import { ArrowUpIcon, ArrowDownIcon } from 'lucide-react';
 
 const CoinListItem = ({ asset }) => {
   const formatNumber = (num) => {
+    if (num === undefined || num === null) return 'N/A';
     if (num < 0.000001) {
       return num.toExponential(2);
     }
@@ -16,11 +17,16 @@ const CoinListItem = ({ asset }) => {
   };
 
   const formatLargeNumber = (num) => {
+    if (num === undefined || num === null) return 'N/A';
     if (num > 1e9) return (num / 1e9).toFixed(2) + 'B';
     if (num > 1e6) return (num / 1e6).toFixed(2) + 'M';
     if (num > 1e3) return (num / 1e3).toFixed(2) + 'K';
     return num.toFixed(2);
   };
+
+  if (!asset || !asset.baseToken) {
+    return null; // or return a placeholder component
+  }
 
   return (
     <Link to={`/asset/${asset.pairAddress}`} className="block hover:bg-gray-800 transition-colors duration-200">
@@ -36,14 +42,14 @@ const CoinListItem = ({ asset }) => {
         </div>
         <div className="text-right">{formatNumber(asset.priceUsd)}</div>
         <div className="text-right">
-          <span className={asset.priceChange.h24 >= 0 ? 'text-green-500' : 'text-red-500'}>
-            {asset.priceChange.h24 >= 0 ? <ArrowUpIcon className="inline w-3 h-3 md:w-4 md:h-4 mr-1" /> : <ArrowDownIcon className="inline w-3 h-3 md:w-4 md:h-4 mr-1" />}
-            {Math.abs(asset.priceChange.h24).toFixed(2)}%
+          <span className={asset.priceChange && asset.priceChange.h24 >= 0 ? 'text-green-500' : 'text-red-500'}>
+            {asset.priceChange && asset.priceChange.h24 >= 0 ? <ArrowUpIcon className="inline w-3 h-3 md:w-4 md:h-4 mr-1" /> : <ArrowDownIcon className="inline w-3 h-3 md:w-4 md:h-4 mr-1" />}
+            {asset.priceChange ? Math.abs(asset.priceChange.h24).toFixed(2) : 'N/A'}%
           </span>
         </div>
-        <div className="text-right hidden md:block">{formatLargeNumber(asset.liquidity.usd)}</div>
-        <div className="text-right hidden md:block">{formatLargeNumber(asset.volume.h24)}</div>
-        <div className="text-right hidden lg:block">{asset.chainId}</div>
+        <div className="text-right hidden md:block">{formatLargeNumber(asset.liquidity?.usd)}</div>
+        <div className="text-right hidden md:block">{formatLargeNumber(asset.volume?.h24)}</div>
+        <div className="text-right hidden lg:block">{asset.chainId || 'N/A'}</div>
       </div>
     </Link>
   );

@@ -24,7 +24,7 @@ const AssetDetailContent = ({ asset }) => (
         {asset.contract_address && <ContractAddress address={asset.contract_address} />}
       </div>
       <div className="bg-gray-800 rounded-lg p-6">
-        <AssetDescription description={asset.description.en} />
+        <AssetDescription description={asset.description.en.split('\n')[0]} />
       </div>
     </div>
     <div className="bg-gray-800 rounded-lg p-6 w-full lg:w-[60%] h-[400px] md:h-[600px] lg:h-auto">
@@ -98,17 +98,24 @@ const AssetDetail = () => {
   }, [asset]);
 
   return (
-    <div className="min-h-screen bg-gray-900 p-4 md:p-6 lg:p-8">
-      <Link to="/" className="inline-flex items-center text-white mb-6 hover:underline">
-        <ArrowLeftIcon className="mr-2" /> Back to list
-      </Link>
-      {isLoading ? (
-        <AssetDetailSkeleton />
-      ) : error ? (
-        <div className="text-center text-xl md:text-2xl font-bold mt-10 text-red-600">Error: {error.message}</div>
-      ) : (
-        <AssetDetailContent asset={asset} />
-      )}
+    <div className="min-h-screen bg-gray-900 p-4 md:p-6 lg:p-8 flex flex-col">
+      <div className="flex-grow">
+        <Link to="/" className="inline-flex items-center text-white mb-6 hover:underline">
+          <ArrowLeftIcon className="mr-2" /> Back to list
+        </Link>
+        {isLoading ? (
+          <AssetDetailSkeleton />
+        ) : error ? (
+          <div className="text-center text-xl md:text-2xl font-bold mt-10 text-red-600">Error: {error.message}</div>
+        ) : (
+          <AssetDetailContent asset={asset} />
+        )}
+      </div>
+      <footer className="mt-8 text-center text-white">
+        <p>
+          Created by <a href="https://github.com/yaasiinaxmed" target="_blank" rel="noopener noreferrer" className="underline hover:text-blue-400">Yasin Ahmed</a>
+        </p>
+      </footer>
     </div>
   );
 };

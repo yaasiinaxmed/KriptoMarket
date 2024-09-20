@@ -7,29 +7,6 @@ import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 
 const fetchAssetData = async (id) => {
-  if (id === 'pumpfun' || id === 'sunpump') {
-    // Return mock data for custom coins
-    return {
-      id,
-      name: id === 'pumpfun' ? 'Pump Fun' : 'Sun Pump',
-      symbol: id,
-      image: { large: `https://example.com/${id}.png` },
-      market_data: {
-        current_price: { usd: id === 'pumpfun' ? 0.1 : 0.2 },
-        market_cap: { usd: id === 'pumpfun' ? 1000000 : 2000000 },
-        price_change_percentage_24h: id === 'pumpfun' ? 10 : 11,
-      },
-      links: {
-        homepage: ['https://example.com'],
-        twitter_screen_name: 'example',
-        repos_url: { github: ['https://github.com/example'] },
-        whitepaper: 'https://example.com/whitepaper.pdf',
-      },
-      description: { en: 'This is a mock description for the custom coin.' },
-      contract_address: '0x1234567890123456789012345678901234567890',
-    };
-  }
-
   const response = await fetch(`https://api.coingecko.com/api/v3/coins/${id}?localization=false&tickers=false&market_data=true&community_data=true&developer_data=true&sparkline=true`);
   if (!response.ok) throw new Error('Network response was not ok');
   return response.json();
@@ -66,32 +43,32 @@ const AssetInfo = ({ asset }) => (
 );
 
 const AssetLinks = ({ asset }) => (
-  <div className="mb-6">
-    <h2 className="text-xl md:text-2xl font-bold mb-4">Links</h2>
-    <div className="flex flex-wrap gap-4">
+  <div className="mb-6 bg-gray-800 p-4 rounded-lg">
+    <h2 className="text-xl font-bold mb-4">Links</h2>
+    <div className="grid grid-cols-2 gap-2">
       {asset.links.homepage[0] && (
-        <Button variant="outline" asChild className="bg-gray-800 hover:bg-gray-700 text-white">
+        <Button variant="outline" asChild className="w-full justify-start bg-gray-700 hover:bg-gray-600 text-white">
           <a href={asset.links.homepage[0]} target="_blank" rel="noopener noreferrer">
             <Globe className="mr-2 h-4 w-4" /> Website
           </a>
         </Button>
       )}
       {asset.links.twitter_screen_name && (
-        <Button variant="outline" asChild className="bg-gray-800 hover:bg-gray-700 text-white">
+        <Button variant="outline" asChild className="w-full justify-start bg-gray-700 hover:bg-gray-600 text-white">
           <a href={`https://twitter.com/${asset.links.twitter_screen_name}`} target="_blank" rel="noopener noreferrer">
             <Twitter className="mr-2 h-4 w-4" /> Twitter
           </a>
         </Button>
       )}
       {asset.links.repos_url.github[0] && (
-        <Button variant="outline" asChild className="bg-gray-800 hover:bg-gray-700 text-white">
+        <Button variant="outline" asChild className="w-full justify-start bg-gray-700 hover:bg-gray-600 text-white">
           <a href={asset.links.repos_url.github[0]} target="_blank" rel="noopener noreferrer">
             <Github className="mr-2 h-4 w-4" /> GitHub
           </a>
         </Button>
       )}
       {asset.links.whitepaper && (
-        <Button variant="outline" asChild className="bg-gray-800 hover:bg-gray-700 text-white">
+        <Button variant="outline" asChild className="w-full justify-start bg-gray-700 hover:bg-gray-600 text-white">
           <a href={asset.links.whitepaper} target="_blank" rel="noopener noreferrer">
             <FileText className="mr-2 h-4 w-4" /> Whitepaper
           </a>
@@ -113,14 +90,14 @@ const ContractAddress = ({ address }) => {
   };
 
   return (
-    <div className="mt-6">
-      <h3 className="text-lg md:text-xl font-bold mb-2">Contract Address:</h3>
-      <div className="flex items-center">
-        <p className="break-all mr-2 text-sm md:text-base">{address}</p>
+    <div className="mt-6 bg-gray-800 p-4 rounded-lg">
+      <h3 className="text-lg font-bold mb-2">Contract Address:</h3>
+      <div className="flex items-center bg-gray-700 p-2 rounded">
+        <p className="break-all mr-2 text-sm flex-grow">{address}</p>
         <Button
           variant="outline"
           size="icon"
-          className="bg-gray-800 hover:bg-gray-700 text-white"
+          className="bg-gray-600 hover:bg-gray-500 text-white"
           onClick={() => copyToClipboard(address)}
         >
           {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
@@ -173,9 +150,9 @@ const AssetDetailSkeleton = () => (
         <Skeleton className="h-6 w-2/3 mb-2 bg-gray-700" />
         <Skeleton className="h-6 w-1/3 mb-4 bg-gray-700" />
         <Skeleton className="h-8 w-1/3 mb-4 bg-gray-700" />
-        <div className="flex flex-wrap gap-4">
+        <div className="grid grid-cols-2 gap-2">
           {[...Array(4)].map((_, i) => (
-            <Skeleton key={i} className="h-10 w-24 bg-gray-700" />
+            <Skeleton key={i} className="h-10 w-full bg-gray-700" />
           ))}
         </div>
       </div>

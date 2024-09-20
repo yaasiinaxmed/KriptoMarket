@@ -4,6 +4,7 @@ import { SearchIcon } from 'lucide-react';
 import { Skeleton } from "@/components/ui/skeleton";
 import CategoryFilter from '../components/CategoryFilter';
 import CoinListItem from '../components/CoinListItem';
+import { toast } from "sonner";
 
 const fetchAllAssets = async () => {
   try {
@@ -45,10 +46,14 @@ const SkeletonRow = () => (
 const Index = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [activeCategory, setActiveCategory] = useState('all');
-  const { data, isLoading, error } = useQuery({
+  const { data, isLoading, error, refetch } = useQuery({
     queryKey: ['allAssets'],
     queryFn: fetchAllAssets,
     refetchInterval: 60000,
+    retry: 3,
+    onError: (error) => {
+      toast.error(`Failed to fetch data: ${error.message}. Please try again later.`);
+    },
   });
 
   const filteredAssets = data
@@ -88,7 +93,15 @@ const Index = () => {
           {isLoading ? (
             Array(20).fill().map((_, index) => <SkeletonRow key={index} />)
           ) : error ? (
-            <div className="col-span-full text-center text-xl md:text-2xl font-bold mt-10 text-red-600">Error: Unable to fetch data</div>
+            <div className="col-span-full text-center text-xl md:text-2xl font-bold mt-10 text-red-600">
+              Error: Unable to fetch data. 
+              <button 
+                onClick={() => refetch()} 
+                className="ml-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
+              >
+                Try Again
+              </button>
+            </div>
           ) : (
             filteredAssets.map((asset) => <CoinListItem key={asset.id} asset={asset} />)
           )}

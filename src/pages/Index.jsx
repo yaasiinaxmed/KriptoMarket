@@ -12,10 +12,13 @@ const fetchAllAssets = async () => {
   return response.json();
 };
 
-const AssetCard = ({ asset }) => (
+const AssetCard = ({ asset, rank }) => (
   <Link to={`/asset/${asset.id}`} className="block">
-    <div className="crypto-card">
-      <div className="flex items-center mb-2">
+    <div className="crypto-card relative">
+      <div className="absolute top-0 left-0 bg-white text-black font-bold px-2 py-1 text-sm">
+        #{rank}
+      </div>
+      <div className="flex items-center mb-2 mt-6">
         <img
           src={`https://assets.coincap.io/assets/icons/${asset.symbol.toLowerCase()}@2x.png`}
           alt={asset.name}
@@ -40,8 +43,9 @@ const AssetCard = ({ asset }) => (
 );
 
 const SkeletonCard = () => (
-  <div className="crypto-card">
-    <div className="flex items-center mb-2">
+  <div className="crypto-card relative">
+    <Skeleton className="absolute top-0 left-0 w-8 h-6" />
+    <div className="flex items-center mb-2 mt-6">
       <Skeleton className="w-8 h-8 mr-2 rounded-full" />
       <Skeleton className="h-6 w-3/4" />
     </div>
@@ -83,9 +87,14 @@ const Index = () => {
         ) : error ? (
           <div className="col-span-full text-center text-2xl font-bold mt-10 text-red-600">Error: {error.message}</div>
         ) : (
-          filteredAssets.map((asset) => <AssetCard key={asset.id} asset={asset} />)
+          filteredAssets.map((asset, index) => <AssetCard key={asset.id} asset={asset} rank={index + 1} />)
         )}
       </div>
+      {!isLoading && !error && (
+        <p className="text-center mt-8 text-xl">
+          Displaying {filteredAssets.length} out of {data.data.length} cryptocurrencies
+        </p>
+      )}
     </div>
   );
 };

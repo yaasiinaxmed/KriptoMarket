@@ -4,14 +4,15 @@ import { SearchIcon } from 'lucide-react';
 import { Skeleton } from "@/components/ui/skeleton";
 import CategoryFilter from '../components/CategoryFilter';
 import CoinListItem from '../components/CoinListItem';
-import { fetchDexScreenerData, getCategoryForAsset } from '../utils/dexScreenerApi';
+import { fetchMockData } from '../utils/mockData';
+import { getCategoryForAsset } from '../utils/categoryUtils';
 
 const Index = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [activeCategory, setActiveCategory] = useState('all');
   const { data, isLoading, error } = useQuery({
-    queryKey: ['dexScreenerAssets'],
-    queryFn: fetchDexScreenerData,
+    queryKey: ['cryptoAssets'],
+    queryFn: fetchMockData,
     refetchInterval: 60000,
   });
 

@@ -3,8 +3,8 @@ import { Button } from "@/components/ui/button";
 import { Globe, Twitter, Github, FileText } from 'lucide-react';
 
 const AssetLinks = ({ asset }) => (
-  <div className="mb-6 bg-gray-800 p-4 rounded-lg">
-    <h2 className="text-xl font-bold mb-4">Links</h2>
+  <div className="mt-4">
+    <h2 className="text-lg font-bold mb-2">Links</h2>
     <div className="grid grid-cols-2 gap-2">
       {asset.links.homepage[0] && (
         <Button variant="outline" asChild className="w-full justify-start bg-gray-700 hover:bg-gray-600 text-white">

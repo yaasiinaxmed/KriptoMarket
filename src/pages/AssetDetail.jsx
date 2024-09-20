@@ -18,16 +18,16 @@ const fetchAssetData = async (id) => {
 const AssetDetailContent = ({ asset }) => (
   <div className='flex flex-col lg:flex-row gap-6'>
     <div className="flex flex-col gap-6 w-full lg:w-[40%]">
-      <div className="bg-gray-800 rounded-lg p-4 md:p-6">
+      <div className="bg-gray-800 rounded-lg p-6">
         <AssetInfo asset={asset} />
         <AssetLinks asset={asset} />
         {asset.contract_address && <ContractAddress address={asset.contract_address} />}
       </div>
-      <div className="bg-gray-800 rounded-lg p-4 md:p-6">
+      <div className="bg-gray-800 rounded-lg p-6">
         <AssetDescription description={asset.description.en} />
       </div>
     </div>
-    <div className="bg-gray-800 rounded-lg p-4 md:p-6 w-full lg:w-[60%] h-[400px] md:h-[600px] lg:h-auto">
+    <div className="bg-gray-800 rounded-lg p-6 w-full lg:w-[60%] h-[400px] md:h-[600px] lg:h-auto">
       <PriceChart symbol={asset.symbol} />
     </div>
   </div>
@@ -36,7 +36,7 @@ const AssetDetailContent = ({ asset }) => (
 const AssetDetailSkeleton = () => (
   <div className='flex flex-col lg:flex-row gap-6'>
     <div className="flex flex-col gap-6 w-full lg:w-[40%]">
-      <div className="bg-gray-800 rounded-lg p-4 md:p-6">
+      <div className="bg-gray-800 rounded-lg p-6">
         <Skeleton className="h-12 w-3/4 mb-4 bg-gray-700" />
         <Skeleton className="h-6 w-1/2 mb-2 bg-gray-700" />
         <Skeleton className="h-6 w-2/3 mb-2 bg-gray-700" />
@@ -48,14 +48,14 @@ const AssetDetailSkeleton = () => (
           ))}
         </div>
       </div>
-      <div className="bg-gray-800 rounded-lg p-4 md:p-6">
+      <div className="bg-gray-800 rounded-lg p-6">
         <Skeleton className="h-8 w-1/3 mb-4 bg-gray-700" />
         <Skeleton className="h-4 w-full mb-2 bg-gray-700" />
         <Skeleton className="h-4 w-full mb-2 bg-gray-700" />
         <Skeleton className="h-4 w-2/3 bg-gray-700" />
       </div>
     </div>
-    <div className="bg-gray-800 rounded-lg p-4 md:p-6 w-full lg:w-[60%] h-[400px] md:h-[600px] lg:h-auto">
+    <div className="bg-gray-800 rounded-lg p-6 w-full lg:w-[60%] h-[400px] md:h-[600px] lg:h-auto">
       <Skeleton className="h-8 w-1/3 mb-4 bg-gray-700" />
       <Skeleton className="w-full h-[calc(100%-2rem)] bg-gray-700" />
     </div>

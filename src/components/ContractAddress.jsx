@@ -15,7 +15,7 @@ const ContractAddress = ({ address }) => {
   };
 
   return (
-    <div className="mt-6 bg-gray-800 p-4 rounded-lg">
+    <div className="mt-4">
       <h3 className="text-lg font-bold mb-2">Contract Address:</h3>
       <div className="flex items-center bg-gray-700 p-2 rounded">
         <p className="break-all mr-2 text-sm flex-grow">{address}</p>

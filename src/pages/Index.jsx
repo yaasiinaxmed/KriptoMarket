@@ -7,40 +7,14 @@ import CoinListItem from '../components/CoinListItem';
 
 const fetchAllAssets = async () => {
   try {
-    const [coingeckoData, pumpfunData, sunpumpData] = await Promise.all([
-      fetch('https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=250&page=1&sparkline=false').then(res => res.json()),
-      fetch('https://api.pumpfun.com/coins').then(res => res.json()),
-      fetch('https://api.sunpump.com/coins').then(res => res.json())
-    ]);
-
-    const pumpfunCoins = pumpfunData.map(coin => ({
-      ...coin,
-      id: `pumpfun_${coin.id}`,
-      name: `${coin.name} (Pump Fun)`,
-      image: 'https://via.placeholder.com/50',
-      current_price: coin.price,
-      market_cap: coin.market_cap,
-      price_change_percentage_24h: coin.price_change_percentage_24h,
-      total_volume: coin.volume_24h,
-      circulating_supply: coin.circulating_supply
-    }));
-
-    const sunpumpCoins = sunpumpData.map(coin => ({
-      ...coin,
-      id: `sunpump_${coin.id}`,
-      name: `${coin.name} (Sun Pump)`,
-      image: 'https://via.placeholder.com/50',
-      current_price: coin.price,
-      market_cap: coin.market_cap,
-      price_change_percentage_24h: coin.price_change_percentage_24h,
-      total_volume: coin.volume_24h,
-      circulating_supply: coin.circulating_supply
-    }));
-
-    return [...coingeckoData, ...pumpfunCoins, ...sunpumpCoins];
+    const response = await fetch('https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=250&page=1&sparkline=false');
+    if (!response.ok) {
+      throw new Error('Network response was not ok');
+    }
+    return response.json();
   } catch (error) {
     console.error('Error fetching data:', error);
-    return [];
+    throw error;
   }
 };
 
@@ -48,9 +22,7 @@ const getCategoryForAsset = (asset) => {
   const name = asset.name.toLowerCase();
   const symbol = asset.symbol.toLowerCase();
 
-  if (name.includes('pump fun') || name.includes('sun pump')) {
-    return 'custom';
-  } else if (name.includes('doge') || name.includes('shib') || symbol.includes('pepe') || symbol.includes('wif') || symbol.includes('floki') || symbol.includes('bonk') || symbol.includes('brett')) {
+  if (name.includes('doge') || name.includes('shib') || symbol.includes('pepe') || symbol.includes('wif') || symbol.includes('floki') || symbol.includes('bonk') || symbol.includes('brett')) {
     return 'meme';
   } else if (name.includes('ai') || name.includes('artificial intelligence')) {
     return 'ai';
@@ -79,12 +51,13 @@ const Index = () => {
     refetchInterval: 60000,
   });
 
-  const filteredAssets = isLoading || !data ? [] : data
-    .filter(asset =>
-      (asset.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-       asset.symbol.toLowerCase().includes(searchTerm.toLowerCase())) &&
-      (activeCategory === 'all' || getCategoryForAsset(asset) === activeCategory)
-    );
+  const filteredAssets = data
+    ? data.filter(asset =>
+        (asset.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+         asset.symbol.toLowerCase().includes(searchTerm.toLowerCase())) &&
+        (activeCategory === 'all' || getCategoryForAsset(asset) === activeCategory)
+      )
+    : [];
 
   return (
     <div className="min-h-screen bg-gray-900 p-4 md:p-8">
@@ -123,7 +96,7 @@ const Index = () => {
       </div>
       {!isLoading && !error && (
         <p className="text-center mt-6 md:mt-8 text-lg md:text-xl">
-          Displaying {filteredAssets.length} out of {data.length} cryptocurrencies
+          Displaying {filteredAssets.length} out of {data ? data.length : 0} cryptocurrencies
         </p>
       )}
     </div>

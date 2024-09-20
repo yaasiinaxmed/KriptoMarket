@@ -14,8 +14,8 @@ const fetchAllAssets = async () => {
 };
 
 const SkeletonRow = () => (
-  <div className="grid grid-cols-8 items-center py-4 px-2 border-b border-gray-700">
-    {[...Array(8)].map((_, index) => (
+  <div className="grid grid-cols-7 gap-4 items-center py-4 px-2 border-b border-gray-700">
+    {[...Array(7)].map((_, index) => (
       <Skeleton key={index} className="h-6 w-full" />
     ))}
   </div>
@@ -70,21 +70,20 @@ const Index = () => {
       <CategoryFilter activeCategory={activeCategory} setActiveCategory={setActiveCategory} />
       <div className="overflow-x-auto">
         <div className="min-w-max">
-          <div className="grid grid-cols-8 items-center py-2 px-2 bg-gray-800 font-bold text-sm">
-            <div className="col-span-1 text-center">#</div>
+          <div className="grid grid-cols-7 gap-4 items-center py-2 px-4 bg-gray-800 font-bold text-sm">
             <div className="col-span-2">Name</div>
-            <div className="col-span-1 text-right">Price</div>
-            <div className="col-span-1 text-right">24h %</div>
-            <div className="col-span-1 text-right">Market Cap</div>
-            <div className="col-span-1 text-right">Volume(24h)</div>
-            <div className="col-span-1 text-right">Circulating Supply</div>
+            <div className="text-right">Price</div>
+            <div className="text-right">24h %</div>
+            <div className="text-right">Market Cap</div>
+            <div className="text-right">Volume(24h)</div>
+            <div className="text-right">Circulating Supply</div>
           </div>
           {isLoading ? (
             Array(20).fill().map((_, index) => <SkeletonRow key={index} />)
           ) : error ? (
             <div className="col-span-full text-center text-2xl font-bold mt-10 text-red-600">Error: {error.message}</div>
           ) : (
-            filteredAssets.map((asset, index) => <CoinListItem key={asset.id} asset={asset} rank={index + 1} />)
+            filteredAssets.map((asset) => <CoinListItem key={asset.id} asset={asset} />)
           )}
         </div>
       </div>

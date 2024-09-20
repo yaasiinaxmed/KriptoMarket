@@ -1,14 +1,14 @@
 import React from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
-import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
-import { ArrowLeftIcon } from 'lucide-react';
+import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
+import { ArrowLeftIcon, ArrowUpIcon, ArrowDownIcon } from 'lucide-react';
 import { Skeleton } from "@/components/ui/skeleton";
 
 const fetchAssetData = async (id) => {
   const [assetResponse, historyResponse] = await Promise.all([
-    fetch(`https://api.coincap.io/v2/assets/${id}`),
-    fetch(`https://api.coincap.io/v2/assets/${id}/history?interval=d1`)
+    fetch(`https://api.coingecko.com/api/v3/coins/${id}`),
+    fetch(`https://api.coingecko.com/api/v3/coins/${id}/market_chart?vs_currency=usd&days=30`)
   ]);
 
   if (!assetResponse.ok || !historyResponse.ok) {
@@ -20,7 +20,23 @@ const fetchAssetData = async (id) => {
     historyResponse.json()
   ]);
 
-  return { asset: assetData.data, history: historyData.data };
+  return { asset: assetData, history: historyData.prices };
+};
+
+const formatNumber = (num) => {
+  return new Intl.NumberFormat('en-US', {
+    style: 'currency',
+    currency: 'USD',
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  }).format(num);
+};
+
+const formatLargeNumber = (num) => {
+  if (num > 1e9) return (num / 1e9).toFixed(2) + 'B';
+  if (num > 1e6) return (num / 1e6).toFixed(2) + 'M';
+  if (num > 1e3) return (num / 1e3).toFixed(2) + 'K';
+  return num.toFixed(2);
 };
 
 const AssetDetailContent = ({ asset, history }) => (
@@ -28,30 +44,40 @@ const AssetDetailContent = ({ asset, history }) => (
     <div className="crypto-card mb-8">
       <div className="flex items-center mb-4">
         <img
-          src={`https://assets.coincap.io/assets/icons/${asset.symbol.toLowerCase()}@2x.png`}
+          src={asset.image.large}
           alt={asset.name}
           className="w-12 h-12 mr-4"
-          onError={(e) => { e.target.onerror = null; e.target.src = 'https://assets.coincap.io/assets/icons/btc@2x.png' }}
         />
-        <h1 className="text-4xl font-black">{asset.name} ({asset.symbol})</h1>
+        <h1 className="text-4xl font-black">{asset.name} ({asset.symbol.toUpperCase()})</h1>
       </div>
-      <p className="text-2xl font-bold mb-2">Price: ${parseFloat(asset.priceUsd).toFixed(2)}</p>
-      <p className="text-xl mb-2">Market Cap: ${parseFloat(asset.marketCapUsd).toFixed(2)}</p>
+      <p className="text-2xl font-bold mb-2">Price: {formatNumber(asset.market_data.current_price.usd)}</p>
+      <p className="text-xl mb-2">Market Cap: {formatLargeNumber(asset.market_data.market_cap.usd)}</p>
       <p className="text-xl mb-2">24h Change: 
-        <span className={asset.changePercent24Hr > 0 ? 'text-green-500' : 'text-red-500'}>
-          {parseFloat(asset.changePercent24Hr).toFixed(2)}%
+        <span className={asset.market_data.price_change_percentage_24h > 0 ? 'text-green-500' : 'text-red-500'}>
+          {asset.market_data.price_change_percentage_24h > 0 ? <ArrowUpIcon className="inline w-4 h-4 mr-1" /> : <ArrowDownIcon className="inline w-4 h-4 mr-1" />}
+          {Math.abs(asset.market_data.price_change_percentage_24h).toFixed(2)}%
         </span>
       </p>
     </div>
     <div className="crypto-card">
       <h2 className="text-2xl font-bold mb-4">Price History (Last 30 Days)</h2>
       <ResponsiveContainer width="100%" height={400}>
-        <LineChart data={history.slice(-30)}>
-          <XAxis dataKey="date" stroke="#fff" />
+        <AreaChart data={history.map(([timestamp, price]) => ({ date: new Date(timestamp), price }))}>
+          <XAxis dataKey="date" tickFormatter={(date) => date.toLocaleDateString()} stroke="#fff" />
           <YAxis stroke="#fff" />
-          <Tooltip contentStyle={{ backgroundColor: '#1f2937', border: 'none' }} />
-          <Line type="monotone" dataKey="priceUsd" stroke="#fff" strokeWidth={2} dot={false} />
-        </LineChart>
+          <Tooltip 
+            contentStyle={{ backgroundColor: '#1f2937', border: 'none' }}
+            labelFormatter={(label) => new Date(label).toLocaleDateString()}
+            formatter={(value) => [formatNumber(value), "Price"]}
+          />
+          <Area type="monotone" dataKey="price" stroke="#fff" fill="url(#colorPrice)" />
+          <defs>
+            <linearGradient id="colorPrice" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="5%" stopColor="#FFFFFF" stopOpacity={0.8}/>
+              <stop offset="95%" stopColor="#FFFFFF" stopOpacity={0}/>
+            </linearGradient>
+          </defs>
+        </AreaChart>
       </ResponsiveContainer>
     </div>
   </>

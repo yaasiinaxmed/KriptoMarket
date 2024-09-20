@@ -6,37 +6,42 @@ import CategoryFilter from '../components/CategoryFilter';
 import CoinListItem from '../components/CoinListItem';
 
 const fetchAllAssets = async () => {
-  const [coingeckoData, pumpfunData, sunpumpData] = await Promise.all([
-    fetch('https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=250&page=1&sparkline=false').then(res => res.json()),
-    fetch('https://api.pumpfun.com/coins').then(res => res.json()),
-    fetch('https://api.sunpump.com/coins').then(res => res.json())
-  ]);
+  try {
+    const [coingeckoData, pumpfunData, sunpumpData] = await Promise.all([
+      fetch('https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=250&page=1&sparkline=false').then(res => res.json()),
+      fetch('https://api.pumpfun.com/coins').then(res => res.json()),
+      fetch('https://api.sunpump.com/coins').then(res => res.json())
+    ]);
 
-  const pumpfunCoins = pumpfunData.map(coin => ({
-    ...coin,
-    id: `pumpfun_${coin.id}`,
-    name: `${coin.name} (Pump Fun)`,
-    image: coin.logo_url,
-    current_price: coin.price,
-    market_cap: coin.market_cap,
-    price_change_percentage_24h: coin.price_change_percentage_24h,
-    total_volume: coin.volume_24h,
-    circulating_supply: coin.circulating_supply
-  }));
+    const pumpfunCoins = pumpfunData.map(coin => ({
+      ...coin,
+      id: `pumpfun_${coin.id}`,
+      name: `${coin.name} (Pump Fun)`,
+      image: 'https://via.placeholder.com/50',
+      current_price: coin.price,
+      market_cap: coin.market_cap,
+      price_change_percentage_24h: coin.price_change_percentage_24h,
+      total_volume: coin.volume_24h,
+      circulating_supply: coin.circulating_supply
+    }));
 
-  const sunpumpCoins = sunpumpData.map(coin => ({
-    ...coin,
-    id: `sunpump_${coin.id}`,
-    name: `${coin.name} (Sun Pump)`,
-    image: coin.logo_url,
-    current_price: coin.price,
-    market_cap: coin.market_cap,
-    price_change_percentage_24h: coin.price_change_percentage_24h,
-    total_volume: coin.volume_24h,
-    circulating_supply: coin.circulating_supply
-  }));
+    const sunpumpCoins = sunpumpData.map(coin => ({
+      ...coin,
+      id: `sunpump_${coin.id}`,
+      name: `${coin.name} (Sun Pump)`,
+      image: 'https://via.placeholder.com/50',
+      current_price: coin.price,
+      market_cap: coin.market_cap,
+      price_change_percentage_24h: coin.price_change_percentage_24h,
+      total_volume: coin.volume_24h,
+      circulating_supply: coin.circulating_supply
+    }));
 
-  return [...coingeckoData, ...pumpfunCoins, ...sunpumpCoins];
+    return [...coingeckoData, ...pumpfunCoins, ...sunpumpCoins];
+  } catch (error) {
+    console.error('Error fetching data:', error);
+    return [];
+  }
 };
 
 const getCategoryForAsset = (asset) => {
@@ -74,7 +79,7 @@ const Index = () => {
     refetchInterval: 60000,
   });
 
-  const filteredAssets = isLoading ? [] : data
+  const filteredAssets = isLoading || !data ? [] : data
     .filter(asset =>
       (asset.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
        asset.symbol.toLowerCase().includes(searchTerm.toLowerCase())) &&
@@ -110,7 +115,7 @@ const Index = () => {
           {isLoading ? (
             Array(20).fill().map((_, index) => <SkeletonRow key={index} />)
           ) : error ? (
-            <div className="col-span-full text-center text-xl md:text-2xl font-bold mt-10 text-red-600">Error: {error.message}</div>
+            <div className="col-span-full text-center text-xl md:text-2xl font-bold mt-10 text-red-600">Error: Unable to fetch data</div>
           ) : (
             filteredAssets.map((asset) => <CoinListItem key={asset.id} asset={asset} />)
           )}

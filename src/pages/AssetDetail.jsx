@@ -33,113 +33,115 @@ const formatLargeNumber = (num) => {
 };
 
 const AssetDetailContent = ({ asset }) => (
-  <div className='flex flex-col md:flex-row gap-8'>
-    <div className="flex flex-col gap-4 w-full md:w-[40%]">
-    <div className="crypto-card mb-8 grid grid-cols-1 gap-8">
-      <div>
-        <div className="flex items-center mb-4">
-          <img
-            src={asset.image.large}
-            alt={asset.name}
-            className="w-12 h-12 mr-4"
-          />
-          <h1 className="text-4xl font-black">{asset.name} ({asset.symbol.toUpperCase()})</h1>
-        </div>
-        <p className="text-2xl font-bold mb-2">Price: {formatNumber(asset.market_data.current_price.usd)}</p>
-        <p className="text-xl mb-2">Market Cap: {formatLargeNumber(asset.market_data.market_cap.usd)}</p>
-        <p className="text-xl mb-2">24h Change: 
-          <span className={asset.market_data.price_change_percentage_24h > 0 ? 'text-green-500' : 'text-red-500'}>
-            {asset.market_data.price_change_percentage_24h > 0 ? <ArrowUpIcon className="inline w-4 h-4 mr-1" /> : <ArrowDownIcon className="inline w-4 h-4 mr-1" />}
-            {Math.abs(asset.market_data.price_change_percentage_24h).toFixed(2)}%
-          </span>
-        </p>
-      </div>
-      <div>
-        <h2 className="text-2xl font-bold mb-4">Links</h2>
-        <div className="flex flex-wrap gap-4">
-          {asset.links.homepage[0] && (
-            <Button variant="outline" asChild>
-              <a href={asset.links.homepage[0]} target="_blank" rel="noopener noreferrer">
-                <Globe className="mr-2 h-4 w-4" /> Website
-              </a>
-            </Button>
-          )}
-          {asset.links.twitter_screen_name && (
-            <Button variant="outline" asChild>
-              <a href={`https://twitter.com/${asset.links.twitter_screen_name}`} target="_blank" rel="noopener noreferrer">
-                <Twitter className="mr-2 h-4 w-4" /> Twitter
-              </a>
-            </Button>
-          )}
-          {asset.links.repos_url.github[0] && (
-            <Button variant="outline" asChild>
-              <a href={asset.links.repos_url.github[0]} target="_blank" rel="noopener noreferrer">
-                <Github className="mr-2 h-4 w-4" /> GitHub
-              </a>
-            </Button>
-          )}
-          {asset.links.whitepaper && (
-            <Button variant="outline" asChild>
-              <a href={asset.links.whitepaper} target="_blank" rel="noopener noreferrer">
-                <FileText className="mr-2 h-4 w-4" /> Whitepaper
-              </a>
-            </Button>
-          )}
-        </div>
-        {asset.contract_address && (
-          <div className="mt-4">
-            <h3 className="text-xl font-bold mb-2">Contract Address:</h3>
-            <p className="break-all">{asset.contract_address}</p>
+  <div className='flex flex-col lg:flex-row gap-8'>
+    <div className="flex flex-col gap-4 w-full lg:w-[40%]">
+      <div className="crypto-card mb-8 grid grid-cols-1 gap-8">
+        <div>
+          <div className="flex items-center mb-4">
+            <img
+              src={asset.image.large}
+              alt={asset.name}
+              className="w-12 h-12 mr-4"
+            />
+            <h1 className="text-4xl font-black">{asset.name} ({asset.symbol.toUpperCase()})</h1>
           </div>
-        )}
+          <p className="text-2xl font-bold mb-2">Price: {formatNumber(asset.market_data.current_price.usd)}</p>
+          <p className="text-xl mb-2">Market Cap: {formatLargeNumber(asset.market_data.market_cap.usd)}</p>
+          <p className="text-xl mb-2">24h Change: 
+            <span className={asset.market_data.price_change_percentage_24h > 0 ? 'text-green-500' : 'text-red-500'}>
+              {asset.market_data.price_change_percentage_24h > 0 ? <ArrowUpIcon className="inline w-4 h-4 mr-1" /> : <ArrowDownIcon className="inline w-4 h-4 mr-1" />}
+              {Math.abs(asset.market_data.price_change_percentage_24h).toFixed(2)}%
+            </span>
+          </p>
+        </div>
+        <div>
+          <h2 className="text-2xl font-bold mb-4">Links</h2>
+          <div className="flex flex-wrap gap-4">
+            {asset.links.homepage[0] && (
+              <Button variant="outline" asChild>
+                <a href={asset.links.homepage[0]} target="_blank" rel="noopener noreferrer">
+                  <Globe className="mr-2 h-4 w-4" /> Website
+                </a>
+              </Button>
+            )}
+            {asset.links.twitter_screen_name && (
+              <Button variant="outline" asChild>
+                <a href={`https://twitter.com/${asset.links.twitter_screen_name}`} target="_blank" rel="noopener noreferrer">
+                  <Twitter className="mr-2 h-4 w-4" /> Twitter
+                </a>
+              </Button>
+            )}
+            {asset.links.repos_url.github[0] && (
+              <Button variant="outline" asChild>
+                <a href={asset.links.repos_url.github[0]} target="_blank" rel="noopener noreferrer">
+                  <Github className="mr-2 h-4 w-4" /> GitHub
+                </a>
+              </Button>
+            )}
+            {asset.links.whitepaper && (
+              <Button variant="outline" asChild>
+                <a href={asset.links.whitepaper} target="_blank" rel="noopener noreferrer">
+                  <FileText className="mr-2 h-4 w-4" /> Whitepaper
+                </a>
+              </Button>
+            )}
+          </div>
+          {asset.contract_address && (
+            <div className="mt-4">
+              <h3 className="text-xl font-bold mb-2">Contract Address:</h3>
+              <p className="break-all">{asset.contract_address}</p>
+            </div>
+          )}
+        </div>
+      </div>
+      <div className="crypto-card mb-8">
+        <h2 className="text-2xl font-bold mb-4">About {asset.name}</h2>
+        <p className="text-sm" dangerouslySetInnerHTML={{ __html: asset.description.en }}></p>
       </div>
     </div>
-    <div className="crypto-card mb-8">
-      <h2 className="text-2xl font-bold mb-4">About {asset.name}</h2>
-      <p className="text-sm" dangerouslySetInnerHTML={{ __html: asset.description.en }}></p>
-    </div>
-    </div>
-    <div className="crypto-card w-full">
+    <div className="crypto-card w-full lg:w-[60%] h-[600px] lg:h-auto">
       <h2 className="text-2xl font-bold mb-4">Price Chart</h2>
-      <div className="tradingview-widget-container h-full">
-        <div id="tradingview_chart"></div>
+      <div className="tradingview-widget-container h-[calc(100%-2rem)]">
+        <div id="tradingview_chart" className="h-full"></div>
       </div>
     </div>
   </div>
 );
 
 const AssetDetailSkeleton = () => (
-  <>
-    <div className="crypto-card mb-8 grid grid-cols-1 md:grid-cols-2 gap-8">
-      <div>
-        <div className="flex items-center mb-4">
-          <Skeleton className="w-12 h-12 mr-4 rounded-full" />
-          <Skeleton className="h-8 w-3/4" />
+  <div className='flex flex-col lg:flex-row gap-8'>
+    <div className="flex flex-col gap-4 w-full lg:w-[40%]">
+      <div className="crypto-card mb-8 grid grid-cols-1 gap-8">
+        <div>
+          <div className="flex items-center mb-4">
+            <Skeleton className="w-12 h-12 mr-4 rounded-full" />
+            <Skeleton className="h-8 w-3/4" />
+          </div>
+          <Skeleton className="h-6 w-1/2 mb-2" />
+          <Skeleton className="h-6 w-2/3 mb-2" />
+          <Skeleton className="h-6 w-1/3" />
         </div>
-        <Skeleton className="h-6 w-1/2 mb-2" />
-        <Skeleton className="h-6 w-2/3 mb-2" />
-        <Skeleton className="h-6 w-1/3" />
+        <div>
+          <Skeleton className="h-8 w-1/3 mb-4" />
+          <div className="flex flex-wrap gap-4">
+            {[...Array(4)].map((_, i) => (
+              <Skeleton key={i} className="h-10 w-24" />
+            ))}
+          </div>
+        </div>
       </div>
-      <div>
+      <div className="crypto-card mb-8">
         <Skeleton className="h-8 w-1/3 mb-4" />
-        <div className="flex flex-wrap gap-4">
-          {[...Array(4)].map((_, i) => (
-            <Skeleton key={i} className="h-10 w-24" />
-          ))}
-        </div>
+        <Skeleton className="h-4 w-full mb-2" />
+        <Skeleton className="h-4 w-full mb-2" />
+        <Skeleton className="h-4 w-2/3" />
       </div>
     </div>
-    <div className="crypto-card mb-8">
+    <div className="crypto-card w-full lg:w-[60%] h-[600px] lg:h-auto">
       <Skeleton className="h-8 w-1/3 mb-4" />
-      <Skeleton className="h-4 w-full mb-2" />
-      <Skeleton className="h-4 w-full mb-2" />
-      <Skeleton className="h-4 w-2/3" />
+      <Skeleton className="w-full h-[calc(100%-2rem)]" />
     </div>
-    <div className="crypto-card">
-      <Skeleton className="h-8 w-1/3 mb-4" />
-      <Skeleton className="w-full h-[400px]" />
-    </div>
-  </>
+  </div>
 );
 
 const AssetDetail = () => {

@@ -4,11 +4,14 @@ import { ArrowUpIcon, ArrowDownIcon } from 'lucide-react';
 
 const CoinListItem = ({ asset }) => {
   const formatNumber = (num) => {
+    if (num < 0.000001) {
+      return num.toExponential(2);
+    }
     return new Intl.NumberFormat('en-US', {
       style: 'currency',
       currency: 'USD',
       minimumFractionDigits: 2,
-      maximumFractionDigits: 2,
+      maximumFractionDigits: 6,
     }).format(num);
   };
 

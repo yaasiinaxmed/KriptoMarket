@@ -14,7 +14,7 @@ const fetchAllAssets = async () => {
 };
 
 const SkeletonRow = () => (
-  <div className="grid grid-cols-7 gap-4 items-center py-4 px-2 border-b border-gray-700">
+  <div className="grid grid-cols-7 gap-4 items-center py-4 px-4 border-b border-gray-700">
     {[...Array(7)].map((_, index) => (
       <Skeleton key={index} className="h-6 w-full" />
     ))}
@@ -43,6 +43,7 @@ const Index = () => {
   const { data, isLoading, error } = useQuery({
     queryKey: ['allAssets'],
     queryFn: fetchAllAssets,
+    refetchInterval: 60000, // Refetch every minute for real-time updates
   });
 
   const filteredAssets = isLoading ? [] : data

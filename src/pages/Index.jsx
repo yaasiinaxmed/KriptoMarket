@@ -5,7 +5,7 @@ import { ArrowUpIcon, ArrowDownIcon, SearchIcon } from 'lucide-react';
 import { Skeleton } from "@/components/ui/skeleton";
 
 const fetchAllAssets = async () => {
-  const response = await fetch('https://api.coincap.io/v2/assets');
+  const response = await fetch('https://api.coincap.io/v2/assets?limit=2000');
   if (!response.ok) {
     throw new Error('Network response was not ok');
   }
@@ -64,7 +64,7 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-gray-900 p-8">
-      <h1 className="text-5xl font-black mb-8 text-center bg-white text-black p-4">Crypto Assets</h1>
+      <h1 className="text-5xl font-black mb-8 text-center bg-white text-black p-4">2000 Crypto Assets</h1>
       <div className="mb-6 flex justify-center">
         <div className="relative">
           <input
@@ -79,7 +79,7 @@ const Index = () => {
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
         {isLoading ? (
-          Array(12).fill().map((_, index) => <SkeletonCard key={index} />)
+          Array(20).fill().map((_, index) => <SkeletonCard key={index} />)
         ) : error ? (
           <div className="col-span-full text-center text-2xl font-bold mt-10 text-red-600">Error: {error.message}</div>
         ) : (

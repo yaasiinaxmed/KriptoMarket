@@ -1,9 +1,10 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
-import { ArrowLeftIcon, ArrowUpIcon, ArrowDownIcon, Globe, Twitter, Github, FileText } from 'lucide-react';
+import { ArrowLeftIcon, ArrowUpIcon, ArrowDownIcon, Globe, Twitter, Github, FileText, Copy, Check } from 'lucide-react';
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
+import { toast } from "sonner";
 
 const fetchAssetData = async (id) => {
   const response = await fetch(`https://api.coingecko.com/api/v3/coins/${id}?localization=false&tickers=false&market_data=true&community_data=true&developer_data=true&sparkline=true`);
@@ -32,81 +33,103 @@ const formatLargeNumber = (num) => {
   return num.toFixed(2);
 };
 
-const AssetDetailContent = ({ asset }) => (
-  <div className='flex flex-col lg:flex-row gap-8'>
-    <div className="flex flex-col gap-4 w-full lg:w-[40%]">
-      <div className="crypto-card mb-8 grid grid-cols-1 gap-8">
-        <div>
-          <div className="flex items-center mb-4">
-            <img
-              src={asset.image.large}
-              alt={asset.name}
-              className="w-12 h-12 mr-4"
-            />
-            <h1 className="text-4xl font-black">{asset.name} ({asset.symbol.toUpperCase()})</h1>
+const AssetDetailContent = ({ asset }) => {
+  const [copied, setCopied] = useState(false);
+
+  const copyToClipboard = (text) => {
+    navigator.clipboard.writeText(text).then(() => {
+      setCopied(true);
+      toast.success("Contract address copied to clipboard!");
+      setTimeout(() => setCopied(false), 3000);
+    });
+  };
+
+  return (
+    <div className='flex flex-col lg:flex-row gap-8'>
+      <div className="flex flex-col gap-4 w-full lg:w-[40%]">
+        <div className="crypto-card mb-8 grid grid-cols-1 gap-8">
+          <div>
+            <div className="flex items-center mb-4">
+              <img
+                src={asset.image.large}
+                alt={asset.name}
+                className="w-12 h-12 mr-4"
+              />
+              <h1 className="text-4xl font-black">{asset.name} ({asset.symbol.toUpperCase()})</h1>
+            </div>
+            <p className="text-2xl font-bold mb-2">Price: {formatNumber(asset.market_data.current_price.usd)}</p>
+            <p className="text-xl mb-2">Market Cap: {formatLargeNumber(asset.market_data.market_cap.usd)}</p>
+            <p className="text-xl mb-2">24h Change: 
+              <span className={asset.market_data.price_change_percentage_24h > 0 ? 'text-green-500' : 'text-red-500'}>
+                {asset.market_data.price_change_percentage_24h > 0 ? <ArrowUpIcon className="inline w-4 h-4 mr-1" /> : <ArrowDownIcon className="inline w-4 h-4 mr-1" />}
+                {Math.abs(asset.market_data.price_change_percentage_24h).toFixed(2)}%
+              </span>
+            </p>
           </div>
-          <p className="text-2xl font-bold mb-2">Price: {formatNumber(asset.market_data.current_price.usd)}</p>
-          <p className="text-xl mb-2">Market Cap: {formatLargeNumber(asset.market_data.market_cap.usd)}</p>
-          <p className="text-xl mb-2">24h Change: 
-            <span className={asset.market_data.price_change_percentage_24h > 0 ? 'text-green-500' : 'text-red-500'}>
-              {asset.market_data.price_change_percentage_24h > 0 ? <ArrowUpIcon className="inline w-4 h-4 mr-1" /> : <ArrowDownIcon className="inline w-4 h-4 mr-1" />}
-              {Math.abs(asset.market_data.price_change_percentage_24h).toFixed(2)}%
-            </span>
-          </p>
-        </div>
-        <div>
-          <h2 className="text-2xl font-bold mb-4">Links</h2>
-          <div className="flex flex-wrap gap-4">
-            {asset.links.homepage[0] && (
-              <Button variant="outline" asChild>
-                <a href={asset.links.homepage[0]} target="_blank" rel="noopener noreferrer">
-                  <Globe className="mr-2 h-4 w-4" /> Website
-                </a>
-              </Button>
-            )}
-            {asset.links.twitter_screen_name && (
-              <Button variant="outline" asChild>
-                <a href={`https://twitter.com/${asset.links.twitter_screen_name}`} target="_blank" rel="noopener noreferrer">
-                  <Twitter className="mr-2 h-4 w-4" /> Twitter
-                </a>
-              </Button>
-            )}
-            {asset.links.repos_url.github[0] && (
-              <Button variant="outline" asChild>
-                <a href={asset.links.repos_url.github[0]} target="_blank" rel="noopener noreferrer">
-                  <Github className="mr-2 h-4 w-4" /> GitHub
-                </a>
-              </Button>
-            )}
-            {asset.links.whitepaper && (
-              <Button variant="outline" asChild>
-                <a href={asset.links.whitepaper} target="_blank" rel="noopener noreferrer">
-                  <FileText className="mr-2 h-4 w-4" /> Whitepaper
-                </a>
-              </Button>
-            )}
+          <div>
+            <h2 className="text-2xl font-bold mb-4">Links</h2>
+            <div className="flex flex-wrap gap-4">
+              {asset.links.homepage[0] && (
+                <Button variant="outline" asChild className="bg-gray-800 hover:bg-gray-700 text-white border-white">
+                  <a href={asset.links.homepage[0]} target="_blank" rel="noopener noreferrer">
+                    <Globe className="mr-2 h-4 w-4" /> Website
+                  </a>
+                </Button>
+              )}
+              {asset.links.twitter_screen_name && (
+                <Button variant="outline" asChild className="bg-gray-800 hover:bg-gray-700 text-white border-white">
+                  <a href={`https://twitter.com/${asset.links.twitter_screen_name}`} target="_blank" rel="noopener noreferrer">
+                    <Twitter className="mr-2 h-4 w-4" /> Twitter
+                  </a>
+                </Button>
+              )}
+              {asset.links.repos_url.github[0] && (
+                <Button variant="outline" asChild className="bg-gray-800 hover:bg-gray-700 text-white border-white">
+                  <a href={asset.links.repos_url.github[0]} target="_blank" rel="noopener noreferrer">
+                    <Github className="mr-2 h-4 w-4" /> GitHub
+                  </a>
+                </Button>
+              )}
+              {asset.links.whitepaper && (
+                <Button variant="outline" asChild className="bg-gray-800 hover:bg-gray-700 text-white border-white">
+                  <a href={asset.links.whitepaper} target="_blank" rel="noopener noreferrer">
+                    <FileText className="mr-2 h-4 w-4" /> Whitepaper
+                  </a>
+                </Button>
+              )}
+            </div>
           </div>
           {asset.contract_address && (
             <div className="mt-4">
               <h3 className="text-xl font-bold mb-2">Contract Address:</h3>
-              <p className="break-all">{asset.contract_address}</p>
+              <div className="flex items-center">
+                <p className="break-all mr-2">{asset.contract_address}</p>
+                <Button
+                  variant="outline"
+                  size="icon"
+                  className="bg-gray-800 hover:bg-gray-700 text-white border-white"
+                  onClick={() => copyToClipboard(asset.contract_address)}
+                >
+                  {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
+                </Button>
+              </div>
             </div>
           )}
         </div>
+        <div className="crypto-card mb-8">
+          <h2 className="text-2xl font-bold mb-4">About {asset.name}</h2>
+          <p className="text-sm" dangerouslySetInnerHTML={{ __html: asset.description.en }}></p>
+        </div>
       </div>
-      <div className="crypto-card mb-8">
-        <h2 className="text-2xl font-bold mb-4">About {asset.name}</h2>
-        <p className="text-sm" dangerouslySetInnerHTML={{ __html: asset.description.en }}></p>
+      <div className="crypto-card w-full lg:w-[60%] h-[600px] lg:h-auto">
+        <h2 className="text-2xl font-bold mb-4">Price Chart</h2>
+        <div className="tradingview-widget-container h-[calc(100%-2rem)]">
+          <div id="tradingview_chart" className="h-full"></div>
+        </div>
       </div>
     </div>
-    <div className="crypto-card w-full lg:w-[60%] h-[600px] lg:h-auto">
-      <h2 className="text-2xl font-bold mb-4">Price Chart</h2>
-      <div className="tradingview-widget-container h-[calc(100%-2rem)]">
-        <div id="tradingview_chart" className="h-full"></div>
-      </div>
-    </div>
-  </div>
-);
+  );
+};
 
 const AssetDetailSkeleton = () => (
   <div className='flex flex-col lg:flex-row gap-8'>
@@ -114,32 +137,32 @@ const AssetDetailSkeleton = () => (
       <div className="crypto-card mb-8 grid grid-cols-1 gap-8">
         <div>
           <div className="flex items-center mb-4">
-            <Skeleton className="w-12 h-12 mr-4 rounded-full" />
-            <Skeleton className="h-8 w-3/4" />
+            <Skeleton className="w-12 h-12 mr-4 rounded-full bg-gray-800" />
+            <Skeleton className="h-8 w-3/4 bg-gray-800" />
           </div>
-          <Skeleton className="h-6 w-1/2 mb-2" />
-          <Skeleton className="h-6 w-2/3 mb-2" />
-          <Skeleton className="h-6 w-1/3" />
+          <Skeleton className="h-6 w-1/2 mb-2 bg-gray-800" />
+          <Skeleton className="h-6 w-2/3 mb-2 bg-gray-800" />
+          <Skeleton className="h-6 w-1/3 bg-gray-800" />
         </div>
         <div>
-          <Skeleton className="h-8 w-1/3 mb-4" />
+          <Skeleton className="h-8 w-1/3 mb-4 bg-gray-800" />
           <div className="flex flex-wrap gap-4">
             {[...Array(4)].map((_, i) => (
-              <Skeleton key={i} className="h-10 w-24" />
+              <Skeleton key={i} className="h-10 w-24 bg-gray-800" />
             ))}
           </div>
         </div>
       </div>
       <div className="crypto-card mb-8">
-        <Skeleton className="h-8 w-1/3 mb-4" />
-        <Skeleton className="h-4 w-full mb-2" />
-        <Skeleton className="h-4 w-full mb-2" />
-        <Skeleton className="h-4 w-2/3" />
+        <Skeleton className="h-8 w-1/3 mb-4 bg-gray-800" />
+        <Skeleton className="h-4 w-full mb-2 bg-gray-800" />
+        <Skeleton className="h-4 w-full mb-2 bg-gray-800" />
+        <Skeleton className="h-4 w-2/3 bg-gray-800" />
       </div>
     </div>
     <div className="crypto-card w-full lg:w-[60%] h-[600px] lg:h-auto">
-      <Skeleton className="h-8 w-1/3 mb-4" />
-      <Skeleton className="w-full h-[calc(100%-2rem)]" />
+      <Skeleton className="h-8 w-1/3 mb-4 bg-gray-800" />
+      <Skeleton className="w-full h-[calc(100%-2rem)] bg-gray-800" />
     </div>
   </div>
 );

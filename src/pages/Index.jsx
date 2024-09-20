@@ -25,7 +25,7 @@ const getCategoryForAsset = (asset) => {
   const name = asset.name.toLowerCase();
   const symbol = asset.symbol.toLowerCase();
 
-  if (name.includes('doge') || name.includes('shib') || symbol.includes('pepe')) {
+  if (name.includes('doge') || name.includes('shib') || symbol.includes('pepe') || symbol.includes('wif') || symbol.includes('floki') || symbol.includes('bonk')  || symbol.includes('brett')) {
     return 'meme';
   } else if (name.includes('ai') || name.includes('artificial intelligence')) {
     return 'ai';
@@ -55,7 +55,7 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-gray-900 p-8">
-      <h1 className="text-5xl font-black mb-8 text-center bg-white text-black p-4">Crypto Market Cap</h1>
+      <h1 className="text-5xl text-white mb-8 text-center p-4">KriptoMarket</h1>
       <div className="mb-6 flex justify-center">
         <div className="relative">
           <input

@@ -1,27 +1,16 @@
 import React from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
-import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
 import { ArrowLeftIcon, ArrowUpIcon, ArrowDownIcon, Globe, Twitter, Github, FileText } from 'lucide-react';
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 
 const fetchAssetData = async (id) => {
-  const [assetResponse, historyResponse] = await Promise.all([
-    fetch(`https://api.coingecko.com/api/v3/coins/${id}?localization=false&tickers=false&market_data=true&community_data=true&developer_data=true&sparkline=true`),
-    fetch(`https://api.coingecko.com/api/v3/coins/${id}/market_chart?vs_currency=usd&days=30`)
-  ]);
-
-  if (!assetResponse.ok || !historyResponse.ok) {
+  const response = await fetch(`https://api.coingecko.com/api/v3/coins/${id}?localization=false&tickers=false&market_data=true&community_data=true&developer_data=true&sparkline=true`);
+  if (!response.ok) {
     throw new Error('Network response was not ok');
   }
-
-  const [assetData, historyData] = await Promise.all([
-    assetResponse.json(),
-    historyResponse.json()
-  ]);
-
-  return { asset: assetData, history: historyData.prices };
+  return response.json();
 };
 
 const formatNumber = (num) => {
@@ -43,7 +32,7 @@ const formatLargeNumber = (num) => {
   return num.toFixed(2);
 };
 
-const AssetDetailContent = ({ asset, history }) => (
+const AssetDetailContent = ({ asset }) => (
   <>
     <div className="crypto-card mb-8 grid grid-cols-1 md:grid-cols-2 gap-8">
       <div>
@@ -109,25 +98,10 @@ const AssetDetailContent = ({ asset, history }) => (
       <p className="text-sm" dangerouslySetInnerHTML={{ __html: asset.description.en }}></p>
     </div>
     <div className="crypto-card">
-      <h2 className="text-2xl font-bold mb-4">Price History (Last 30 Days)</h2>
-      <ResponsiveContainer width="100%" height={400}>
-        <AreaChart data={history.map(([timestamp, price]) => ({ date: new Date(timestamp), price }))}>
-          <defs>
-            <linearGradient id="colorPrice" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="5%" stopColor="#8884d8" stopOpacity={0.8}/>
-              <stop offset="95%" stopColor="#8884d8" stopOpacity={0}/>
-            </linearGradient>
-          </defs>
-          <XAxis dataKey="date" tickFormatter={(date) => date.toLocaleDateString()} stroke="#fff" />
-          <YAxis stroke="#fff" tickFormatter={(value) => formatNumber(value)} />
-          <Tooltip
-            contentStyle={{ backgroundColor: '#1f2937', border: 'none' }}
-            labelFormatter={(label) => new Date(label).toLocaleDateString()}
-            formatter={(value) => [formatNumber(value), "Price"]}
-          />
-          <Area type="monotone" dataKey="price" stroke="#8884d8" fillOpacity={1} fill="url(#colorPrice)" />
-        </AreaChart>
-      </ResponsiveContainer>
+      <h2 className="text-2xl font-bold mb-4">Price Chart</h2>
+      <div className="tradingview-widget-container">
+        <div id="tradingview_chart"></div>
+      </div>
     </div>
   </>
 );
@@ -168,14 +142,41 @@ const AssetDetailSkeleton = () => (
 
 const AssetDetail = () => {
   const { id } = useParams();
-  const { data, isLoading, error } = useQuery({
+  const { data: asset, isLoading, error } = useQuery({
     queryKey: ['assetDetail', id],
     queryFn: () => fetchAssetData(id),
     refetchInterval: 60000, // Refetch every minute for real-time updates
   });
 
+  React.useEffect(() => {
+    if (asset) {
+      const script = document.createElement('script');
+      script.src = 'https://s3.tradingview.com/tv.js';
+      script.async = true;
+      script.onload = () => {
+        new window.TradingView.widget({
+          autosize: true,
+          symbol: `${asset.symbol.toUpperCase()}USD`,
+          interval: "D",
+          timezone: "Etc/UTC",
+          theme: "dark",
+          style: "1",
+          locale: "en",
+          toolbar_bg: "#f1f3f6",
+          enable_publishing: false,
+          allow_symbol_change: true,
+          container_id: "tradingview_chart"
+        });
+      };
+      document.body.appendChild(script);
+      return () => {
+        document.body.removeChild(script);
+      };
+    }
+  }, [asset]);
+
   return (
-    <div className="min-h-screen bg-gray-900 p-8">
+    <div className="min-h-screen bg-gray-900 p-4 md:p-8">
       <Link to="/" className="inline-flex items-center text-white mb-6 hover:underline">
         <ArrowLeftIcon className="mr-2" /> Back to list
       </Link>
@@ -184,7 +185,7 @@ const AssetDetail = () => {
       ) : error ? (
         <div className="text-center text-2xl font-bold mt-10 text-red-600">Error: {error.message}</div>
       ) : (
-        <AssetDetailContent asset={data.asset} history={data.history} />
+        <AssetDetailContent asset={asset} />
       )}
     </div>
   );

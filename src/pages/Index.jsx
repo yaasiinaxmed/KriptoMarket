@@ -2,14 +2,53 @@ import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Link } from 'react-router-dom';
 import { ArrowUpIcon, ArrowDownIcon, SearchIcon } from 'lucide-react';
+import { Skeleton } from "@/components/ui/skeleton";
 
 const fetchAllAssets = async () => {
-  const response = await fetch('https://api.coincap.io/v2/assets?limit=200');
+  const response = await fetch('https://api.coincap.io/v2/assets');
   if (!response.ok) {
     throw new Error('Network response was not ok');
   }
   return response.json();
 };
+
+const AssetCard = ({ asset }) => (
+  <Link to={`/asset/${asset.id}`} className="block">
+    <div className="crypto-card">
+      <div className="flex items-center mb-2">
+        <img
+          src={`https://assets.coincap.io/assets/icons/${asset.symbol.toLowerCase()}@2x.png`}
+          alt={asset.name}
+          className="w-8 h-8 mr-2"
+          onError={(e) => { e.target.onerror = null; e.target.src = 'https://assets.coincap.io/assets/icons/btc@2x.png' }}
+        />
+        <h2 className="text-xl font-bold">{asset.name} ({asset.symbol})</h2>
+      </div>
+      <p className="text-lg font-semibold mb-2">${parseFloat(asset.priceUsd).toFixed(2)}</p>
+      <p className="flex items-center">
+        {asset.changePercent24Hr > 0 ? (
+          <ArrowUpIcon className="text-green-500 mr-1" />
+        ) : (
+          <ArrowDownIcon className="text-red-500 mr-1" />
+        )}
+        <span className={asset.changePercent24Hr > 0 ? 'text-green-500' : 'text-red-500'}>
+          {parseFloat(asset.changePercent24Hr).toFixed(2)}%
+        </span>
+      </p>
+    </div>
+  </Link>
+);
+
+const SkeletonCard = () => (
+  <div className="crypto-card">
+    <div className="flex items-center mb-2">
+      <Skeleton className="w-8 h-8 mr-2 rounded-full" />
+      <Skeleton className="h-6 w-3/4" />
+    </div>
+    <Skeleton className="h-6 w-1/2 mb-2" />
+    <Skeleton className="h-4 w-1/4" />
+  </div>
+);
 
 const Index = () => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -18,10 +57,7 @@ const Index = () => {
     queryFn: fetchAllAssets,
   });
 
-  if (isLoading) return <div className="text-center text-2xl font-bold mt-10">Loading...</div>;
-  if (error) return <div className="text-center text-2xl font-bold mt-10 text-red-600">Error: {error.message}</div>;
-
-  const filteredAssets = data.data.filter(asset =>
+  const filteredAssets = isLoading ? [] : data.data.filter(asset =>
     asset.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
     asset.symbol.toLowerCase().includes(searchTerm.toLowerCase())
   );
@@ -42,32 +78,13 @@ const Index = () => {
         </div>
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-        {filteredAssets.map((asset) => (
-          <Link to={`/asset/${asset.id}`} key={asset.id} className="block">
-            <div className="crypto-card">
-              <div className="flex items-center mb-2">
-                <img
-                  src={`https://assets.coincap.io/assets/icons/${asset.symbol.toLowerCase()}@2x.png`}
-                  alt={asset.name}
-                  className="w-8 h-8 mr-2"
-                  onError={(e) => { e.target.onerror = null; e.target.src = 'https://assets.coincap.io/assets/icons/btc@2x.png' }}
-                />
-                <h2 className="text-xl font-bold">{asset.name} ({asset.symbol})</h2>
-              </div>
-              <p className="text-lg font-semibold mb-2">${parseFloat(asset.priceUsd).toFixed(2)}</p>
-              <p className="flex items-center">
-                {asset.changePercent24Hr > 0 ? (
-                  <ArrowUpIcon className="text-green-500 mr-1" />
-                ) : (
-                  <ArrowDownIcon className="text-red-500 mr-1" />
-                )}
-                <span className={asset.changePercent24Hr > 0 ? 'text-green-500' : 'text-red-500'}>
-                  {parseFloat(asset.changePercent24Hr).toFixed(2)}%
-                </span>
-              </p>
-            </div>
-          </Link>
-        ))}
+        {isLoading ? (
+          Array(12).fill().map((_, index) => <SkeletonCard key={index} />)
+        ) : error ? (
+          <div className="col-span-full text-center text-2xl font-bold mt-10 text-red-600">Error: {error.message}</div>
+        ) : (
+          filteredAssets.map((asset) => <AssetCard key={asset.id} asset={asset} />)
+        )}
       </div>
     </div>
   );

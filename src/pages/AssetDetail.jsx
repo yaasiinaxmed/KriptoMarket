@@ -7,6 +7,29 @@ import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 
 const fetchAssetData = async (id) => {
+  if (id === 'pumpfun' || id === 'sunpump') {
+    // Return mock data for custom coins
+    return {
+      id,
+      name: id === 'pumpfun' ? 'Pump Fun' : 'Sun Pump',
+      symbol: id,
+      image: { large: `https://example.com/${id}.png` },
+      market_data: {
+        current_price: { usd: id === 'pumpfun' ? 0.1 : 0.2 },
+        market_cap: { usd: id === 'pumpfun' ? 1000000 : 2000000 },
+        price_change_percentage_24h: id === 'pumpfun' ? 10 : 11,
+      },
+      links: {
+        homepage: ['https://example.com'],
+        twitter_screen_name: 'example',
+        repos_url: { github: ['https://github.com/example'] },
+        whitepaper: 'https://example.com/whitepaper.pdf',
+      },
+      description: { en: 'This is a mock description for the custom coin.' },
+      contract_address: '0x1234567890123456789012345678901234567890',
+    };
+  }
+
   const response = await fetch(`https://api.coingecko.com/api/v3/coins/${id}?localization=false&tickers=false&market_data=true&community_data=true&developer_data=true&sparkline=true`);
   if (!response.ok) throw new Error('Network response was not ok');
   return response.json();

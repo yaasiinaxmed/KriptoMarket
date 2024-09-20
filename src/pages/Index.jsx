@@ -10,22 +10,76 @@ const fetchAllAssets = async () => {
   if (!response.ok) {
     throw new Error('Network response was not ok');
   }
-  return response.json();
-};
+  const data = await response.json();
 
-const SkeletonRow = () => (
-  <div className="grid grid-cols-4 md:grid-cols-5 lg:grid-cols-7 gap-2 md:gap-4 items-center py-2 md:py-4 px-2 md:px-4 border-b border-gray-700">
-    {[...Array(7)].map((_, index) => (
-      <Skeleton key={index} className={`h-6 w-full bg-gray-800 ${index > 3 && index < 6 ? 'hidden md:block' : ''} ${index === 6 ? 'hidden lg:block' : ''}`} />
-    ))}
-  </div>
-);
+  // Add custom coins
+  const customCoins = [
+    {
+      id: 'pumpfun',
+      symbol: 'pumpfun',
+      name: 'Pump Fun',
+      image: 'https://example.com/pumpfun.png',
+      current_price: 0.1,
+      market_cap: 1000000,
+      market_cap_rank: null,
+      fully_diluted_valuation: 1000000,
+      total_volume: 100000,
+      high_24h: 0.11,
+      low_24h: 0.09,
+      price_change_24h: 0.01,
+      price_change_percentage_24h: 10,
+      market_cap_change_24h: 100000,
+      market_cap_change_percentage_24h: 10,
+      circulating_supply: 10000000,
+      total_supply: 100000000,
+      max_supply: 100000000,
+      ath: 0.15,
+      ath_change_percentage: -33.33,
+      ath_date: "2023-01-01T00:00:00.000Z",
+      atl: 0.05,
+      atl_change_percentage: 100,
+      atl_date: "2022-01-01T00:00:00.000Z",
+      roi: null,
+      last_updated: "2023-04-30T00:00:00.000Z"
+    },
+    {
+      id: 'sunpump',
+      symbol: 'sunpump',
+      name: 'Sun Pump',
+      image: 'https://example.com/sunpump.png',
+      current_price: 0.2,
+      market_cap: 2000000,
+      market_cap_rank: null,
+      fully_diluted_valuation: 2000000,
+      total_volume: 200000,
+      high_24h: 0.22,
+      low_24h: 0.18,
+      price_change_24h: 0.02,
+      price_change_percentage_24h: 11,
+      market_cap_change_24h: 200000,
+      market_cap_change_percentage_24h: 11,
+      circulating_supply: 10000000,
+      total_supply: 100000000,
+      max_supply: 100000000,
+      ath: 0.25,
+      ath_change_percentage: -20,
+      ath_date: "2023-02-01T00:00:00.000Z",
+      atl: 0.1,
+      atl_change_percentage: 100,
+      atl_date: "2022-02-01T00:00:00.000Z",
+      roi: null,
+      last_updated: "2023-04-30T00:00:00.000Z"
+    }
+  ];
+
+  return [...data, ...customCoins];
+};
 
 const getCategoryForAsset = (asset) => {
   const name = asset.name.toLowerCase();
   const symbol = asset.symbol.toLowerCase();
 
-  if (name.includes('doge') || name.includes('shib') || symbol.includes('pepe') || symbol.includes('wif') || symbol.includes('floki') || symbol.includes('bonk')  || symbol.includes('brett')) {
+  if (name.includes('doge') || name.includes('shib') || symbol.includes('pepe') || symbol.includes('wif') || symbol.includes('floki') || symbol.includes('bonk') || symbol.includes('brett') || name === 'pump fun' || name === 'sun pump') {
     return 'meme';
   } else if (name.includes('ai') || name.includes('artificial intelligence')) {
     return 'ai';
@@ -37,13 +91,21 @@ const getCategoryForAsset = (asset) => {
   return 'all';
 };
 
+const SkeletonRow = () => (
+  <div className="grid grid-cols-4 md:grid-cols-5 lg:grid-cols-7 gap-2 md:gap-4 items-center py-2 md:py-4 px-2 md:px-4 border-b border-gray-700">
+    {[...Array(7)].map((_, index) => (
+      <Skeleton key={index} className={`h-6 w-full bg-gray-800 ${index > 3 && index < 6 ? 'hidden md:block' : ''} ${index === 6 ? 'hidden lg:block' : ''}`} />
+    ))}
+  </div>
+);
+
 const Index = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [activeCategory, setActiveCategory] = useState('all');
   const { data, isLoading, error } = useQuery({
     queryKey: ['allAssets'],
     queryFn: fetchAllAssets,
-    refetchInterval: 60000, // Refetch every minute for real-time updates
+    refetchInterval: 60000,
   });
 
   const filteredAssets = isLoading ? [] : data

@@ -5,7 +5,6 @@ import { ArrowLeftIcon } from 'lucide-react';
 import { Skeleton } from "@/components/ui/skeleton";
 import AssetInfo from '../components/AssetInfo';
 import AssetLinks from '../components/AssetLinks';
-import ContractAddress from '../components/ContractAddress';
 import AssetDescription from '../components/AssetDescription';
 import PriceChart from '../components/PriceChart';
 
@@ -21,7 +20,6 @@ const AssetDetailContent = ({ asset }) => (
       <div className="bg-gray-800 rounded-lg p-6">
         <AssetInfo asset={asset} />
         <AssetLinks asset={asset} />
-        {asset.contract_address && <ContractAddress address={asset.contract_address} />}
       </div>
       <div className="bg-gray-800 rounded-lg p-6">
         <AssetDescription description={asset.description.en.split('\n')[0]} />

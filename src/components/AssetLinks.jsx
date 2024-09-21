@@ -37,7 +37,7 @@ const AssetLinks = ({ asset }) => (
     </div>
 
     <h2 className="text-lg font-bold mt-4 mb-2">Available Exchanges</h2>
-    <div className="border-4 border-white p-2 bg-gray-800 rounded-lg">
+    <div className="bg-gray-800 rounded-lg p-2">
       <div className="max-h-60 overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-gray-600 scrollbar-track-gray-800">
         {asset.tickers.map((ticker, index) => (
           <Button 

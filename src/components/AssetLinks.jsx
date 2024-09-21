@@ -40,7 +40,15 @@ const AssetLinks = ({ asset }) => (
     <div className="grid grid-cols-2 gap-2">
       {asset.tickers.slice(0, 6).map((ticker, index) => (
         <Button key={index} variant="outline" asChild className="w-full justify-start bg-gray-700 hover:bg-gray-600 text-white">
-          <a href={ticker.trade_url} target="_blank" rel="noopener noreferrer">
+          <a href={ticker.trade_url} target="_blank" rel="noopener noreferrer" className="flex items-center">
+            {ticker.market.logo && (
+              <img 
+                src={ticker.market.logo} 
+                alt={`${ticker.market.name} logo`} 
+                className="w-4 h-4 mr-2 rounded-full"
+                onError={(e) => { e.target.style.display = 'none' }}
+              />
+            )}
             <DollarSign className="mr-2 h-4 w-4" /> {ticker.market.name}
           </a>
         </Button>

@@ -34,12 +34,23 @@ const fetchAssetData = async (id) => {
     ])
   );
 
-  // Add logos and types to tickers
-  assetData.tickers = assetData.tickers.map(ticker => ({
-    ...ticker,
-    exchange_logo: exchangeMap[ticker.market.identifier]?.logo,
-    exchange_type: exchangeMap[ticker.market.identifier]?.type || 'Unknown'
-  }));
+  // Filter and deduplicate tickers
+  const uniqueTickers = [];
+  const seenExchanges = new Set();
+
+  assetData.tickers.forEach(ticker => {
+    const exchangeId = ticker.market.identifier;
+    if (!seenExchanges.has(exchangeId)) {
+      seenExchanges.add(exchangeId);
+      uniqueTickers.push({
+        ...ticker,
+        exchange_logo: exchangeMap[exchangeId]?.logo,
+        exchange_type: exchangeMap[exchangeId]?.type || 'Unknown'
+      });
+    }
+  });
+
+  assetData.tickers = uniqueTickers;
 
   return assetData;
 };

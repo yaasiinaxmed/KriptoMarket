@@ -47,7 +47,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 button, .button {
-  @apply bg-white text-black font-bold py-2 px-4 border-4 border-white shadow-[4px_4px_0px_0px_rgba(255,255,255,0.5)] hover:shadow-none transition-shadow duration-300;
+  @apply bg-white text-black font-bold py-2 px-4 shadow-[4px_4px_0px_0px_rgba(255,255,255,0.5)] hover:shadow-none transition-shadow duration-300;
 }
 
 input, select, textarea {
@@ -55,5 +55,29 @@ input, select, textarea {
 }
 
 .crypto-card {
-  @apply bg-gray-800 border-4 border-white shadow-[8px_8px_0px_0px_rgba(255,255,255,0.2)] hover:shadow-none transition-shadow duration-300 p-6;
+  @apply bg-gray-800 shadow-[8px_8px_0px_0px_rgba(255,255,255,0.2)] hover:shadow-none transition-shadow duration-300 p-6;
+}
+
+/* Custom Scrollbar Styles */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #1f2937; /* Tailwind's gray-800 */
+}
+
+::-webkit-scrollbar-thumb {
+  background: #4b5563; /* Tailwind's gray-600 */
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #6b7280; /* Tailwind's gray-500 */
+}
+
+/* For Firefox */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #4b5563 #1f2937;
 }

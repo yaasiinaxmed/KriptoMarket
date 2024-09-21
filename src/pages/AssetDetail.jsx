@@ -22,10 +22,10 @@ const AssetDetailContent = ({ asset }) => (
         <AssetLinks asset={asset} />
       </div>
       <div className="bg-gray-800 rounded-lg p-6">
-        <AssetDescription description={asset.description.en.split('\n')[0]} />
+        <AssetDescription description={asset.description.en} />
       </div>
     </div>
-    <div className="bg-gray-800 rounded-lg p-6 w-full lg:w-[60%] h-[400px] md:h-[600px] lg:h-auto">
+    <div className="bg-gray-800 rounded-lg p-3 w-full lg:w-[60%] h-[400px] md:h-[600px] lg:h-auto">
       <PriceChart symbol={asset.symbol} />
     </div>
   </div>
@@ -109,10 +109,22 @@ const AssetDetail = () => {
           <AssetDetailContent asset={asset} />
         )}
       </div>
-      <footer className="mt-8 text-center text-white">
-        <p>
-          Created by <a href="https://github.com/yaasiinaxmed" target="_blank" rel="noopener noreferrer" className="underline hover:text-blue-400">Yasin Ahmed</a>
-        </p>
+      <footer className="mt-8 bg-gray-800 rounded-lg py-6 text-white">
+        <div className="container mx-auto text-center">
+          <p className="text-sm mb-4">© 2024 KriptoMarket. All rights reserved.</p>
+          <p className="mb-4">Empowering your crypto journey with trust and transparency.</p>
+          <p>
+            Built with 💙 by
+            <a
+              href="https://github.com/yaasiinaxmed"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="cursor-pointer ml-1 text-blue-400 hover:text-blue-300 transition-colors duration-300"
+            >
+              Yasin Ahmed
+            </a>
+          </p>
+        </div>
       </footer>
     </div>
   );

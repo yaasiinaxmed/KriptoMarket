@@ -65,7 +65,7 @@ const AssetDetail = () => {
   const { data: asset, isLoading, error } = useQuery({
     queryKey: ['assetDetail', id],
     queryFn: () => fetchAssetData(id),
-    refetchInterval: 60000,
+    refetchInterval: 3000, // Update every 3 seconds
   });
 
   useEffect(() => {

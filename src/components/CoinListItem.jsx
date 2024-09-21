@@ -24,7 +24,7 @@ const CoinListItem = ({ asset }) => {
 
   return (
     <Link to={`/asset/${asset.id}`} className="block hover:bg-gray-800 transition-colors duration-200">
-      <div className="grid grid-cols-4 md:grid-cols-5 lg:grid-cols-7 gap-2 md:gap-4 items-center py-2 md:py-4 px-2 md:px-4 border-b border-gray-700 text-xs md:text-sm">
+      <div className="grid grid-cols-4 md:grid-cols-5 lg:grid-cols-7 gap-2 md:gap-4 items-center py-2 md:py-3 lg:py-4 px-2 md:px-3 lg:px-4 border-b border-gray-700 text-xs md:text-sm">
         <div className="col-span-2 flex items-center">
           <span className="font-bold mr-2 w-6 md:w-8 text-right">{asset.market_cap_rank}</span>
           <img
@@ -33,7 +33,7 @@ const CoinListItem = ({ asset }) => {
             className="w-5 h-5 md:w-6 md:h-6 mr-2"
           />
           <span className="font-bold truncate">{asset.name}</span>
-          <span className="text-gray-400 ml-1 inline">{asset.symbol.toUpperCase()}</span>
+          <span className="text-gray-400 ml-1 hidden sm:inline">{asset.symbol.toUpperCase()}</span>
         </div>
         <div className="text-right">{formatNumber(asset.current_price)}</div>
         <div className="text-right">

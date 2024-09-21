@@ -25,7 +25,7 @@ const AssetDetailContent = ({ asset }) => (
         <AssetDescription description={asset.description.en} />
       </div>
     </div>
-    <div className="bg-gray-800 rounded-lg p-3 w-full lg:w-[60%] h-[400px] md:h-[600px] lg:h-auto">
+    <div className="bg-gray-800 rounded-lg p-3 w-full lg:w-[60%] h-[500px] md:h-[600px] lg:h-[700px]">
       <PriceChart symbol={asset.symbol} />
     </div>
   </div>
@@ -53,7 +53,7 @@ const AssetDetailSkeleton = () => (
         <Skeleton className="h-4 w-2/3 bg-gray-700" />
       </div>
     </div>
-    <div className="bg-gray-800 rounded-lg p-6 w-full lg:w-[60%] h-[400px] md:h-[600px] lg:h-auto">
+    <div className="bg-gray-800 rounded-lg p-6 w-full lg:w-[60%] h-[500px] md:h-[600px] lg:h-[700px]">
       <Skeleton className="h-8 w-1/3 mb-4 bg-gray-700" />
       <Skeleton className="w-full h-[calc(100%-2rem)] bg-gray-700" />
     </div>

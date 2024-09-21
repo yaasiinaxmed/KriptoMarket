@@ -37,25 +37,31 @@ const AssetLinks = ({ asset }) => (
     </div>
 
     <h2 className="text-lg font-bold mt-4 mb-2">Available Exchanges</h2>
-    <div className="grid grid-cols-2 gap-2 max-h-60 overflow-y-auto">
-      {asset.tickers.map((ticker, index) => (
-        <Button key={index} variant="outline" asChild className="w-full justify-start bg-gray-700 hover:bg-gray-600 text-white">
-          <a href={ticker.trade_url} target="_blank" rel="noopener noreferrer" className="flex items-center">
-            {ticker.exchange_logo ? (
-              <img 
-                src={ticker.exchange_logo} 
-                alt={`${ticker.market.name} logo`} 
-                className="w-4 h-4 mr-2 rounded-full"
-                onError={(e) => { e.target.onerror = null; e.target.src = '/placeholder.svg'; }}
-              />
-            ) : (
-              <DollarSign className="mr-2 h-4 w-4" />
-            )}
-            <span className="truncate">{ticker.market.name}</span>
-            <span className="ml-auto text-xs font-semibold">{ticker.exchange_type}</span>
-          </a>
-        </Button>
-      ))}
+    <div className="border-4 border-white p-2 bg-gray-800 rounded-lg">
+      <div className="max-h-60 overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-gray-600 scrollbar-track-gray-800">
+        {asset.tickers.map((ticker, index) => (
+          <Button 
+            key={index} 
+            variant="outline" 
+            asChild 
+            className="w-full justify-start bg-gray-700 hover:bg-gray-600 text-white mb-2 last:mb-0"
+          >
+            <a href={ticker.trade_url} target="_blank" rel="noopener noreferrer" className="flex items-center">
+              {ticker.exchange_logo ? (
+                <img 
+                  src={ticker.exchange_logo} 
+                  alt={`${ticker.market.name} logo`} 
+                  className="w-6 h-6 mr-2 rounded-full"
+                  onError={(e) => { e.target.onerror = null; e.target.src = '/placeholder.svg'; }}
+                />
+              ) : (
+                <DollarSign className="mr-2 h-6 w-6" />
+              )}
+              <span className="truncate">{ticker.market.name}</span>
+            </a>
+          </Button>
+        ))}
+      </div>
     </div>
   </div>
 );

@@ -23,15 +23,22 @@ const fetchAssetData = async (id) => {
     exchangesResponse.json()
   ]);
 
-  // Create a map of exchange id to logo
-  const exchangeLogoMap = Object.fromEntries(
-    exchangesData.map(exchange => [exchange.id, exchange.image])
+  // Create a map of exchange id to logo and type (CEX/DEX)
+  const exchangeMap = Object.fromEntries(
+    exchangesData.map(exchange => [
+      exchange.id,
+      {
+        logo: exchange.image,
+        type: exchange.centralized ? 'CEX' : 'DEX'
+      }
+    ])
   );
 
-  // Add logos to tickers
+  // Add logos and types to tickers
   assetData.tickers = assetData.tickers.map(ticker => ({
     ...ticker,
-    exchange_logo: exchangeLogoMap[ticker.market.identifier]
+    exchange_logo: exchangeMap[ticker.market.identifier]?.logo,
+    exchange_type: exchangeMap[ticker.market.identifier]?.type || 'Unknown'
   }));
 
   return assetData;

@@ -1,6 +1,6 @@
 import React from 'react';
 import { Button } from "@/components/ui/button";
-import { Globe, Twitter, Github, FileText } from 'lucide-react';
+import { Globe, Twitter, Github, FileText, DollarSign } from 'lucide-react';
 
 const AssetLinks = ({ asset }) => (
   <div className="mt-4">
@@ -34,6 +34,17 @@ const AssetLinks = ({ asset }) => (
           </a>
         </Button>
       )}
+    </div>
+
+    <h2 className="text-lg font-bold mt-4 mb-2">Available Exchanges</h2>
+    <div className="grid grid-cols-2 gap-2">
+      {asset.tickers.slice(0, 6).map((ticker, index) => (
+        <Button key={index} variant="outline" asChild className="w-full justify-start bg-gray-700 hover:bg-gray-600 text-white">
+          <a href={ticker.trade_url} target="_blank" rel="noopener noreferrer">
+            <DollarSign className="mr-2 h-4 w-4" /> {ticker.market.name}
+          </a>
+        </Button>
+      ))}
     </div>
   </div>
 );

@@ -9,7 +9,7 @@ import AssetDescription from '../components/AssetDescription';
 import PriceChart from '../components/PriceChart';
 
 const fetchAssetData = async (id) => {
-  const response = await fetch(`https://api.coingecko.com/api/v3/coins/${id}?localization=false&tickers=false&market_data=true&community_data=true&developer_data=true&sparkline=true`);
+  const response = await fetch(`https://api.coingecko.com/api/v3/coins/${id}?localization=false&tickers=true&market_data=true&community_data=true&developer_data=true&sparkline=true`);
   if (!response.ok) throw new Error('Network response was not ok');
   return response.json();
 };

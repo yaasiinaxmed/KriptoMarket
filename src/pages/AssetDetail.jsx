@@ -9,9 +9,32 @@ import AssetDescription from '../components/AssetDescription';
 import PriceChart from '../components/PriceChart';
 
 const fetchAssetData = async (id) => {
-  const response = await fetch(`https://api.coingecko.com/api/v3/coins/${id}?localization=false&tickers=true&market_data=true&community_data=true&developer_data=true&sparkline=true`);
-  if (!response.ok) throw new Error('Network response was not ok');
-  return response.json();
+  const [assetResponse, exchangesResponse] = await Promise.all([
+    fetch(`https://api.coingecko.com/api/v3/coins/${id}?localization=false&tickers=true&market_data=true&community_data=true&developer_data=true&sparkline=true`),
+    fetch('https://api.coingecko.com/api/v3/exchanges')
+  ]);
+
+  if (!assetResponse.ok || !exchangesResponse.ok) {
+    throw new Error('Network response was not ok');
+  }
+
+  const [assetData, exchangesData] = await Promise.all([
+    assetResponse.json(),
+    exchangesResponse.json()
+  ]);
+
+  // Create a map of exchange id to logo
+  const exchangeLogoMap = Object.fromEntries(
+    exchangesData.map(exchange => [exchange.id, exchange.image])
+  );
+
+  // Add logos to tickers
+  assetData.tickers = assetData.tickers.map(ticker => ({
+    ...ticker,
+    exchange_logo: exchangeLogoMap[ticker.market.identifier]
+  }));
+
+  return assetData;
 };
 
 const AssetDetailContent = ({ asset }) => (

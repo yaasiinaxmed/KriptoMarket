@@ -41,15 +41,17 @@ const AssetLinks = ({ asset }) => (
       {asset.tickers.slice(0, 6).map((ticker, index) => (
         <Button key={index} variant="outline" asChild className="w-full justify-start bg-gray-700 hover:bg-gray-600 text-white">
           <a href={ticker.trade_url} target="_blank" rel="noopener noreferrer" className="flex items-center">
-            {ticker.market.logo && (
+            {ticker.exchange_logo ? (
               <img 
-                src={ticker.market.logo} 
+                src={ticker.exchange_logo} 
                 alt={`${ticker.market.name} logo`} 
                 className="w-4 h-4 mr-2 rounded-full"
-                onError={(e) => { e.target.style.display = 'none' }}
+                onError={(e) => { e.target.onerror = null; e.target.src = '/placeholder.svg'; }}
               />
+            ) : (
+              <DollarSign className="mr-2 h-4 w-4" />
             )}
-            <DollarSign className="mr-2 h-4 w-4" /> {ticker.market.name}
+            {ticker.market.name}
           </a>
         </Button>
       ))}

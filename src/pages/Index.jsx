@@ -49,7 +49,7 @@ const Index = () => {
   const { data, isLoading, error, refetch } = useQuery({
     queryKey: ['allAssets'],
     queryFn: fetchAllAssets,
-    refetchInterval: 3000, // Update every 3 seconds
+    refetchInterval: 60000,
     retry: 3,
     onError: (error) => {
       toast.error(`Failed to fetch data: ${error.message}. Please try again later.`);

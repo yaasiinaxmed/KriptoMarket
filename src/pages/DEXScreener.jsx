@@ -1,106 +1,88 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { Link } from 'react-router-dom';
-import { ArrowLeftIcon, SearchIcon, ExternalLinkIcon } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Skeleton } from "@/components/ui/skeleton";
 import { toast } from "sonner";
 
-const fetchLatestPairs = async () => {
-  const response = await fetch('https://api.dexscreener.com/latest/dex/pairs/bsc/0x10ED43C718714eb63d5aA57B78B54704E256024E');
+const chainOptions = [
+  { value: 'solana', label: 'Solana' },
+  { value: 'ethereum', label: 'Ethereum' },
+  { value: 'tron', label: 'Tron' },
+  { value: 'base', label: 'Base' },
+  { value: 'bsc', label: 'BNB Chain' },
+];
+
+const fetchTokenProfiles = async () => {
+  const response = await fetch('https://api.dexscreener.com/token-profiles/latest/v1');
   if (!response.ok) {
-    throw new Error('Failed to fetch latest pairs');
+    throw new Error('Failed to fetch token profiles');
   }
   return response.json();
 };
 
 const DEXScreener = () => {
+  const [selectedChain, setSelectedChain] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
 
-  const { data, isLoading, error } = useQuery({
-    queryKey: ['latestPairs'],
-    queryFn: fetchLatestPairs,
-    refetchInterval: 60000,
-    retry: 3,
-    onError: (error) => {
-      toast.error(`Failed to fetch data: ${error.message}. Please try again later.`);
-    },
+  const { data: tokenProfiles, isLoading, error } = useQuery({
+    queryKey: ['tokenProfiles'],
+    queryFn: fetchTokenProfiles,
+    refetchInterval: 60000, // Refetch every minute
   });
 
-  const filteredPairs = data?.pairs.filter(pair =>
-    pair.baseToken.symbol.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    pair.quoteToken.symbol.toLowerCase().includes(searchTerm.toLowerCase())
+  const filteredTokens = tokenProfiles?.filter(token => 
+    (!selectedChain || token.chainId === selectedChain) &&
+    (!searchTerm || token.description?.toLowerCase().includes(searchTerm.toLowerCase()))
   ) || [];
 
   return (
-    <div className="min-h-screen bg-gray-900 p-4 md:p-8 flex flex-col">
-      <div className="flex-grow">
-        <Link to="/" className="inline-flex items-center text-white mb-6 hover:underline">
-          <ArrowLeftIcon className="mr-2" /> Back to Home
-        </Link>
-        <h1 className="text-3xl md:text-4xl font-bold text-white mb-6">DEX Screener</h1>
-        
-        <div className="mb-6 flex justify-center">
-          <div className="relative w-full md:w-96">
-            <Input
-              type="text"
-              placeholder="Search by token symbol..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full px-4 py-2 rounded-full bg-gray-800 text-white border-2 border-white focus:outline-none"
-            />
-            <SearchIcon className="absolute right-4 top-3 text-white" />
-          </div>
-        </div>
-
-        {isLoading ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {[...Array(6)].map((_, index) => (
-              <Skeleton key={index} className="h-40 w-full bg-gray-800" />
+    <div className="min-h-screen bg-gray-900 p-4 md:p-8">
+      <h1 className="text-3xl md:text-4xl font-bold text-white mb-6">DEX Screener</h1>
+      
+      <div className="flex flex-col md:flex-row gap-4 mb-6">
+        <Select onValueChange={setSelectedChain} value={selectedChain}>
+          <SelectTrigger className="w-full md:w-[200px]">
+            <SelectValue placeholder="Select Chain" />
+          </SelectTrigger>
+          <SelectContent>
+            {chainOptions.map(option => (
+              <SelectItem key={option.value} value={option.value}>{option.label}</SelectItem>
             ))}
-          </div>
-        ) : error ? (
-          <div className="text-red-500 text-center">Error: {error.message}</div>
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {filteredPairs.map((pair, index) => (
-              <div key={index} className="bg-gray-800 p-4 rounded-lg">
-                <h3 className="text-lg font-semibold mb-2">{pair.baseToken.symbol}/{pair.quoteToken.symbol}</h3>
-                <p className="text-sm text-gray-400 mb-2">Price: ${parseFloat(pair.priceUsd).toFixed(6)}</p>
-                <p className="text-sm text-gray-400 mb-2">24h Volume: ${parseInt(pair.volume.h24).toLocaleString()}</p>
-                <p className="text-sm text-gray-400 mb-2">Liquidity: ${parseInt(pair.liquidity.usd).toLocaleString()}</p>
-                <a 
-                  href={`https://dexscreener.com/${pair.chainId}/${pair.pairAddress}`} 
-                  target="_blank" 
-                  rel="noopener noreferrer" 
-                  className="text-blue-400 hover:text-blue-300 flex items-center"
-                >
-                  View on DEXScreener
-                  <ExternalLinkIcon className="ml-1 h-4 w-4" />
-                </a>
-              </div>
-            ))}
-          </div>
-        )}
+          </SelectContent>
+        </Select>
+        <Input
+          type="text"
+          placeholder="Search tokens..."
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          className="w-full md:w-[300px]"
+        />
       </div>
-      <footer className="mt-8 bg-gray-800 rounded-lg py-6 text-white">
-        <div className="container mx-auto text-center">
-          <p className="text-sm mb-4">© 2024 KriptoMarket. All rights reserved.</p>
-          <p className="mb-4">Empowering your crypto journey with trust and transparency.</p>
-          <p>
-            Built with 💙 by
-            <a
-              href="https://github.com/yaasiinaxmed"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="cursor-pointer ml-1 text-blue-400 hover:text-blue-300 transition-colors duration-300"
-            >
-              Yasin Ahmed
-            </a>
-          </p>
+
+      {isLoading ? (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {[...Array(6)].map((_, index) => (
+            <Skeleton key={index} className="h-40 w-full bg-gray-800" />
+          ))}
         </div>
-      </footer>
+      ) : error ? (
+        <div className="text-red-500">Error: {error.message}</div>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {filteredTokens.map((token, index) => (
+            <div key={index} className="bg-gray-800 p-4 rounded-lg">
+              <img src={token.icon} alt={token.description} className="w-12 h-12 mb-2 rounded-full" />
+              <h3 className="text-lg font-semibold mb-2">{token.description}</h3>
+              <p className="text-sm text-gray-400 mb-2">Chain: {token.chainId}</p>
+              <a href={token.url} target="_blank" rel="noopener noreferrer" className="text-blue-400 hover:text-blue-300">
+                View on DEXScreener
+              </a>
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 };

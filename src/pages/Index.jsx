@@ -20,14 +20,14 @@ const fetchAllAssets = async () => {
   }
 };
 
-const fetchMarketData = async () => {
-  const [globalData, trendingCoins, topGainers] = await Promise.all([
-    fetch('https://api.coingecko.com/api/v3/global').then(res => res.json()),
-    fetch('https://api.coingecko.com/api/v3/search/trending').then(res => res.json()),
-    fetch('https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=price_change_percentage_24h_desc&per_page=3&page=1&sparkline=false').then(res => res.json())
-  ]);
-  return { globalData, trendingCoins, topGainers };
-};
+// const fetchMarketData = async () => {
+//   const [globalData, trendingCoins, topGainers] = await Promise.all([
+//     fetch('https://api.coingecko.com/api/v3/global').then(res => res.json()),
+//     fetch('https://api.coingecko.com/api/v3/search/trending').then(res => res.json()),
+//     fetch('https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=price_change_percentage_24h_desc&per_page=3&page=1&sparkline=false').then(res => res.json())
+//   ]);
+//   return { globalData, trendingCoins, topGainers };
+// };
 
 const formatNumber = (num) => {
   if (num >= 1e12) return (num / 1e12).toFixed(2) + 'T';
@@ -100,15 +100,15 @@ const Index = () => {
     },
   });
 
-  const { data: dataMarket, isLoading: marketIsLoading, error: marketError } = useQuery({
-    queryKey: ['marketData'],
-    queryFn: fetchMarketData,
-    refetchInterval: 60000,
-  });
+  // const { data: dataMarket, isLoading: marketIsLoading, error: marketError } = useQuery({
+  //   queryKey: ['marketData'],
+  //   queryFn: fetchMarketData,
+  //   refetchInterval: 60000,
+  // });
 
-  const { globalData, trendingCoins, topGainers } = dataMarket || {};
+  // const { globalData, trendingCoins, topGainers } = dataMarket || {};
 
-  console.log("treding:", trendingCoins, topGainers)
+  // console.log("treding:", trendingCoins, topGainers)
 
 
   const filteredAssets = data
@@ -140,9 +140,9 @@ const Index = () => {
         </div>
         <CategoryFilter activeCategory={activeCategory} setActiveCategory={setActiveCategory} />
         {/* Market Overview, Trending, and Top Gainers */}
-        {!marketIsLoading && !marketError && globalData && trendingCoins && topGainers && (
+        {/* {!marketIsLoading && !marketError && globalData && trendingCoins && topGainers && (
           <div className="w-full flex items-center justify-center flex-wrap gap-8 mb-8">
-            {/* Market Overview */}
+            Market Overview 
             <div className="bg-gray-800 p-4 rounded-lg shadow-lg">
               <h2 className="text-2xl font-bold mb-4 text-white">Cryptocurrency Market Overview</h2>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -165,7 +165,7 @@ const Index = () => {
               </div>
             </div>
 
-            {/* Trending Coins */}
+            Trending Coins
             <div className="mb-6">
               <h2 className="text-2xl font-bold mb-4 text-white flex items-center">
                 <Flame className="mr-2 text-orange-500" /> Trending
@@ -191,7 +191,7 @@ const Index = () => {
               </div>
             </div>
 
-            {/* Top Gainers */}
+            Top Gainers
             <div>
               <h2 className="text-2xl font-bold mb-4 text-white flex items-center">
                 <TrendingUpIcon className="mr-2 text-green-500" /> Top Gainers
@@ -221,7 +221,7 @@ const Index = () => {
 
           </div>
 
-        )}
+        )} */}
         <div className="overflow-x-auto">
           <div className="min-w-full">
             <div className="grid grid-cols-4 md:grid-cols-5 lg:grid-cols-7 gap-2 md:gap-4 items-center py-2 md:py-4 px-2 md:px-4 bg-gray-800 font-bold text-xs md:text-sm">

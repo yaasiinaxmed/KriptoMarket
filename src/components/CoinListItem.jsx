@@ -33,7 +33,7 @@ const CoinListItem = ({ asset }) => {
             className="w-5 h-5 md:w-6 md:h-6 mr-2"
           />
           <span className="font-bold truncate">{asset.name}</span>
-          <span className="text-gray-400 ml-1 hidden sm:inline">{asset.symbol.toUpperCase()}</span>
+          <span className="text-gray-400 ml-1 inline">{asset.symbol.toUpperCase()}</span>
         </div>
         <div className="text-right">{formatNumber(asset.current_price)}</div>
         <div className="text-right">

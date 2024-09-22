@@ -62,30 +62,30 @@ const SkeletonRow = () => (
 );
 
 
-const CoinCard = ({ coin, isTrending }) => (
-  <Link to={`/asset/${coin.id}`} className="bg-gray-800 p-4 rounded-lg shadow-md transition-transform duration-200 transform hover:scale-105">
-    <div className="flex items-center mb-2">
-      <img src={coin.image || coin.large} alt={coin.name} className="w-10 h-10 mr-3 rounded-full border-2 border-gray-700" />
-      <div>
-        <h3 className="font-bold text-lg text-white">{coin.name}</h3>
-        <p className="text-sm text-gray-400">{coin.symbol.toUpperCase()}</p>
-      </div>
-    </div>
-    {!isTrending && (
-      <div className="mt-2">
-        <p className="font-semibold text-xl text-white">${coin.current_price.toFixed(2)}</p>
-        <p className={`text-sm ${coin.price_change_percentage_24h >= 0 ? 'text-green-500' : 'text-red-500'}`}>
-          {coin.price_change_percentage_24h >= 0 ? (
-            <ArrowUpIcon className="inline w-4 h-4 mr-1" />
-          ) : (
-            <ArrowDownIcon className="inline w-4 h-4 mr-1" />
-          )}
-          {Math.abs(coin.price_change_percentage_24h).toFixed(2)}%
-        </p>
-      </div>
-    )}
-  </Link>
-);
+// const CoinCard = ({ coin, isTrending }) => (
+//   <Link to={`/asset/${coin.id}`} className="bg-gray-800 p-4 rounded-lg shadow-md transition-transform duration-200 transform hover:scale-105">
+//     <div className="flex items-center mb-2">
+//       <img src={coin.image || coin.large} alt={coin.name} className="w-10 h-10 mr-3 rounded-full border-2 border-gray-700" />
+//       <div>
+//         <h3 className="font-bold text-lg text-white">{coin.name}</h3>
+//         <p className="text-sm text-gray-400">{coin.symbol.toUpperCase()}</p>
+//       </div>
+//     </div>
+//     {!isTrending && (
+//       <div className="mt-2">
+//         <p className="font-semibold text-xl text-white">${coin.current_price.toFixed(2)}</p>
+//         <p className={`text-sm ${coin.price_change_percentage_24h >= 0 ? 'text-green-500' : 'text-red-500'}`}>
+//           {coin.price_change_percentage_24h >= 0 ? (
+//             <ArrowUpIcon className="inline w-4 h-4 mr-1" />
+//           ) : (
+//             <ArrowDownIcon className="inline w-4 h-4 mr-1" />
+//           )}
+//           {Math.abs(coin.price_change_percentage_24h).toFixed(2)}%
+//         </p>
+//       </div>
+//     )}
+//   </Link>
+// );
 
 const Index = () => {
   const [searchTerm, setSearchTerm] = useState('');

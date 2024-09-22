@@ -122,8 +122,8 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-gray-900 p-4 md:p-8 flex flex-col">
       <div className="flex-grow">
-        <div className="mb-6 md:mb-8 flex flex-col gap-2">
-          <h1 className="text-3xl md:text-5xl text-white text-center p-2 md:p-4">Kripto<span className='text-blue-500'>Market</span></h1>
+        <div className="mb-6 md:mb-8 flex flex-col items-center justify-center gap-4">
+            <img src="./logo.png" alt="Kriptomarket Logo" className="w-[15rem] sm:w-[20rem]" />
           <p className='text-center'>Empowering your crypto journey with trust and transparency.</p>
         </div>
         <div className="mb-4 md:mb-6 flex justify-center">

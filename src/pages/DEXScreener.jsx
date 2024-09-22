@@ -1,40 +1,57 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
+import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Skeleton } from "@/components/ui/skeleton";
-import { ArrowLeftIcon } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { toast } from "sonner";
 
-const fetchDEXScreenerPairs = async () => {
-  const response = await fetch('https://api.dexscreener.com/latest/dex/pairs/ethereum/0x88e6a0c2ddd26feeb64f039a2c41296fcb3f5640');
+const chainOptions = [
+  { value: 'solana', label: 'Solana' },
+  { value: 'ethereum', label: 'Ethereum' },
+  { value: 'tron', label: 'Tron' },
+  { value: 'base', label: 'Base' },
+  { value: 'bsc', label: 'BNB Chain' },
+];
+
+const fetchTokenProfiles = async () => {
+  const response = await fetch('https://api.dexscreener.com/token-profiles/latest/v1');
   if (!response.ok) {
-    throw new Error('Failed to fetch DEXScreener pairs');
+    throw new Error('Failed to fetch token profiles');
   }
   return response.json();
 };
 
 const DEXScreener = () => {
+  const [selectedChain, setSelectedChain] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
 
-  const { data, isLoading, error } = useQuery({
-    queryKey: ['dexScreenerPairs'],
-    queryFn: fetchDEXScreenerPairs,
+  const { data: tokenProfiles, isLoading, error } = useQuery({
+    queryKey: ['tokenProfiles'],
+    queryFn: fetchTokenProfiles,
     refetchInterval: 60000, // Refetch every minute
   });
 
-  const filteredPairs = data?.pairs?.filter(pair => 
-    pair.baseToken.symbol.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    pair.quoteToken.symbol.toLowerCase().includes(searchTerm.toLowerCase())
+  const filteredTokens = tokenProfiles?.filter(token => 
+    (!selectedChain || token.chainId === selectedChain) &&
+    (!searchTerm || token.description?.toLowerCase().includes(searchTerm.toLowerCase()))
   ) || [];
 
   return (
     <div className="min-h-screen bg-gray-900 p-4 md:p-8">
-      <Link to="/" className="inline-flex items-center text-white mb-6 hover:underline">
-        <ArrowLeftIcon className="mr-2" /> Back to Home
-      </Link>
       <h1 className="text-3xl md:text-4xl font-bold text-white mb-6">DEX Screener</h1>
       
-      <div className="mb-6">
+      <div className="flex flex-col md:flex-row gap-4 mb-6">
+        <Select onValueChange={setSelectedChain} value={selectedChain}>
+          <SelectTrigger className="w-full md:w-[200px]">
+            <SelectValue placeholder="Select Chain" />
+          </SelectTrigger>
+          <SelectContent>
+            {chainOptions.map(option => (
+              <SelectItem key={option.value} value={option.value}>{option.label}</SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
         <Input
           type="text"
           placeholder="Search tokens..."
@@ -54,14 +71,12 @@ const DEXScreener = () => {
         <div className="text-red-500">Error: {error.message}</div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {filteredPairs.map((pair, index) => (
-            <div key={index} className="bg-gray-800 p-4 rounded-lg hover:bg-gray-700 transition-colors duration-200">
-              <h3 className="text-lg font-semibold mb-2">{pair.baseToken.symbol}/{pair.quoteToken.symbol}</h3>
-              <p className="text-sm text-gray-400 mb-2">Chain: {pair.chainId}</p>
-              <p className="text-sm mb-1">Price: ${parseFloat(pair.priceUsd).toFixed(6)}</p>
-              <p className="text-sm mb-1">24h Volume: ${parseInt(pair.volume.h24).toLocaleString()}</p>
-              <p className="text-sm mb-2">Liquidity: ${parseInt(pair.liquidity.usd).toLocaleString()}</p>
-              <a href={pair.url} target="_blank" rel="noopener noreferrer" className="text-blue-400 hover:text-blue-300">
+          {filteredTokens.map((token, index) => (
+            <div key={index} className="bg-gray-800 p-4 rounded-lg">
+              <img src={token.icon} alt={token.description} className="w-12 h-12 mb-2 rounded-full" />
+              <h3 className="text-lg font-semibold mb-2">{token.description}</h3>
+              <p className="text-sm text-gray-400 mb-2">Chain: {token.chainId}</p>
+              <a href={token.url} target="_blank" rel="noopener noreferrer" className="text-blue-400 hover:text-blue-300">
                 View on DEXScreener
               </a>
             </div>

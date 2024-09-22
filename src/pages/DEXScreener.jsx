@@ -28,7 +28,7 @@ const DEXScreener = () => {
     },
   });
 
-  const filteredPairs = data?.pairs?.filter(pair =>
+  const filteredPairs = data?.pairs.filter(pair =>
     pair.baseToken.symbol.toLowerCase().includes(searchTerm.toLowerCase()) ||
     pair.quoteToken.symbol.toLowerCase().includes(searchTerm.toLowerCase())
   ) || [];

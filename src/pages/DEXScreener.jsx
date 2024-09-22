@@ -8,16 +8,16 @@ import { Link } from 'react-router-dom';
 
 const chainOptions = [
   { value: 'ethereum', label: 'Ethereum' },
-  { value: 'bsc', label: 'BNB Chain' },
-  { value: 'polygon', label: 'Polygon' },
+  { value: 'binance-smart-chain', label: 'BNB Chain' },
+  { value: 'polygon-pos', label: 'Polygon' },
   { value: 'avalanche', label: 'Avalanche' },
   { value: 'fantom', label: 'Fantom' },
 ];
 
-const fetchPairs = async () => {
-  const response = await fetch('https://api.dexscreener.com/latest/dex/pairs/bsc/0x7213a321F1855CF1779f42c0CD85d3D95291D34C,0x16b9a82891338f9ba80e2d6970fdda79d1eb0dae');
+const fetchCoins = async () => {
+  const response = await fetch('https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=250&page=1&sparkline=false');
   if (!response.ok) {
-    throw new Error('Failed to fetch pairs');
+    throw new Error('Failed to fetch coins');
   }
   return response.json();
 };
@@ -33,17 +33,17 @@ const DEXScreener = () => {
   const [selectedChain, setSelectedChain] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
 
-  const { data, isLoading, error } = useQuery({
-    queryKey: ['dexPairs'],
-    queryFn: fetchPairs,
+  const { data: coins, isLoading, error } = useQuery({
+    queryKey: ['coins'],
+    queryFn: fetchCoins,
     refetchInterval: 60000, // Refetch every minute
   });
 
-  const filteredPairs = data?.pairs?.filter(pair => 
-    (!selectedChain || pair.chainId === selectedChain) &&
+  const filteredCoins = coins?.filter(coin => 
+    (!selectedChain || coin.asset_platform_id === selectedChain) &&
     (!searchTerm || 
-      pair.baseToken.symbol.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      pair.quoteToken.symbol.toLowerCase().includes(searchTerm.toLowerCase()))
+      coin.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      coin.symbol.toLowerCase().includes(searchTerm.toLowerCase()))
   ) || [];
 
   return (
@@ -51,13 +51,13 @@ const DEXScreener = () => {
       <div className="flex-grow">
         <div className="mb-6 md:mb-8 flex flex-col gap-2">
           <h1 className="text-3xl md:text-5xl text-white text-center p-2 md:p-4">DEX<span className='text-blue-500'>Screener</span></h1>
-          <p className='text-center'>Real-time DEX pair information and analytics</p>
+          <p className='text-center'>Real-time cryptocurrency information and analytics</p>
         </div>
         <div className="mb-4 md:mb-6 flex flex-col md:flex-row justify-center gap-4">
           <div className="relative w-full md:w-96">
             <Input
               type="text"
-              placeholder="Search tokens..."
+              placeholder="Search coins..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="w-full px-4 py-2 rounded-full bg-gray-800 text-white border-2 md:border-2 border-white focus:outline-none"
@@ -82,7 +82,7 @@ const DEXScreener = () => {
               <div className="text-right">Price</div>
               <div className="text-right">24h %</div>
               <div className="text-right">Volume(24h)</div>
-              <div className="text-right">Liquidity</div>
+              <div className="text-right">Market Cap</div>
               <div className="text-right">Actions</div>
             </div>
             {isLoading ? (
@@ -98,42 +98,42 @@ const DEXScreener = () => {
                 Error: {error.message}
               </div>
             ) : (
-              filteredPairs.map((pair, index) => (
-                <div key={pair.pairAddress} className="grid grid-cols-7 gap-2 md:gap-4 items-center py-2 md:py-4 px-2 md:px-4 border-b border-gray-700 hover:bg-gray-800 transition-colors duration-200">
+              filteredCoins.map((coin, index) => (
+                <div key={coin.id} className="grid grid-cols-7 gap-2 md:gap-4 items-center py-2 md:py-4 px-2 md:px-4 border-b border-gray-700 hover:bg-gray-800 transition-colors duration-200">
                   <div className="col-span-2 flex items-center">
                     <span className="font-bold mr-2 w-6 md:w-8 text-right">{index + 1}</span>
                     <img
-                      src={`https://assets.coincap.io/assets/icons/${pair.baseToken.symbol.toLowerCase()}@2x.png`}
-                      alt={pair.baseToken.symbol}
+                      src={coin.image}
+                      alt={coin.name}
                       className="w-5 h-5 md:w-6 md:h-6 mr-2"
                       onError={(e) => { e.target.onerror = null; e.target.src = '/placeholder.svg'; }}
                     />
                     <div>
-                      <span className="font-bold">{pair.baseToken.symbol}</span>
-                      <span className="text-gray-400 ml-1 hidden sm:inline">/ {pair.quoteToken.symbol}</span>
+                      <span className="font-bold">{coin.name}</span>
+                      <span className="text-gray-400 ml-1 hidden sm:inline">({coin.symbol.toUpperCase()})</span>
                     </div>
                   </div>
-                  <div className="text-right">${parseFloat(pair.priceUsd).toFixed(6)}</div>
-                  <div className={`text-right ${pair.priceChange.h24 >= 0 ? 'text-green-500' : 'text-red-500'}`}>
-                    {pair.priceChange.h24 >= 0 ? <ArrowUpIcon className="inline w-4 h-4 mr-1" /> : <ArrowDownIcon className="inline w-4 h-4 mr-1" />}
-                    {Math.abs(pair.priceChange.h24).toFixed(2)}%
+                  <div className="text-right">${coin.current_price.toFixed(2)}</div>
+                  <div className={`text-right ${coin.price_change_percentage_24h >= 0 ? 'text-green-500' : 'text-red-500'}`}>
+                    {coin.price_change_percentage_24h >= 0 ? <ArrowUpIcon className="inline w-4 h-4 mr-1" /> : <ArrowDownIcon className="inline w-4 h-4 mr-1" />}
+                    {Math.abs(coin.price_change_percentage_24h).toFixed(2)}%
                   </div>
-                  <div className="text-right">${formatNumber(pair.volume.h24)}</div>
-                  <div className="text-right">${formatNumber(pair.liquidity.usd)}</div>
+                  <div className="text-right">${formatNumber(coin.total_volume)}</div>
+                  <div className="text-right">${formatNumber(coin.market_cap)}</div>
                   <div className="text-right">
                     <Link
-                      to={`/asset/${pair.baseToken.address}`}
+                      to={`/asset/${coin.id}`}
                       className="text-blue-400 hover:text-blue-300 mr-2"
                     >
                       Details
                     </Link>
                     <a 
-                      href={`https://dexscreener.com/${pair.chainId}/${pair.pairAddress}`} 
+                      href={`https://www.coingecko.com/en/coins/${coin.id}`} 
                       target="_blank" 
                       rel="noopener noreferrer" 
                       className="text-blue-400 hover:text-blue-300"
                     >
-                      DEXScreener
+                      CoinGecko
                     </a>
                   </div>
                 </div>
@@ -143,7 +143,7 @@ const DEXScreener = () => {
         </div>
         {!isLoading && !error && (
           <p className="text-center mt-6 md:mt-8 text-lg md:text-xl">
-            Displaying {filteredPairs.length} out of {data?.pairs?.length || 0} pairs
+            Displaying {filteredCoins.length} out of {coins?.length || 0} coins
           </p>
         )}
       </div>

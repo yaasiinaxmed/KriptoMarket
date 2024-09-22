@@ -1,40 +1,48 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Skeleton } from "@/components/ui/skeleton";
-import { toast } from "sonner";
+import { ArrowUpIcon, ArrowDownIcon } from 'lucide-react';
 
 const chainOptions = [
-  { value: 'solana', label: 'Solana' },
   { value: 'ethereum', label: 'Ethereum' },
-  { value: 'tron', label: 'Tron' },
-  { value: 'base', label: 'Base' },
   { value: 'bsc', label: 'BNB Chain' },
+  { value: 'polygon', label: 'Polygon' },
+  { value: 'avalanche', label: 'Avalanche' },
+  { value: 'fantom', label: 'Fantom' },
 ];
 
-const fetchTokenProfiles = async () => {
-  const response = await fetch('https://api.dexscreener.com/token-profiles/latest/v1');
+const fetchPairs = async () => {
+  const response = await fetch('https://api.dexscreener.com/latest/dex/tokens/0x2170Ed0880ac9A755fd29B2688956BD959F933F8,0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c');
   if (!response.ok) {
-    throw new Error('Failed to fetch token profiles');
+    throw new Error('Failed to fetch pairs');
   }
   return response.json();
+};
+
+const formatNumber = (num) => {
+  if (num >= 1e9) return (num / 1e9).toFixed(2) + 'B';
+  if (num >= 1e6) return (num / 1e6).toFixed(2) + 'M';
+  if (num >= 1e3) return (num / 1e3).toFixed(2) + 'K';
+  return num.toFixed(2);
 };
 
 const DEXScreener = () => {
   const [selectedChain, setSelectedChain] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
 
-  const { data: tokenProfiles, isLoading, error } = useQuery({
-    queryKey: ['tokenProfiles'],
-    queryFn: fetchTokenProfiles,
+  const { data, isLoading, error } = useQuery({
+    queryKey: ['dexPairs'],
+    queryFn: fetchPairs,
     refetchInterval: 60000, // Refetch every minute
   });
 
-  const filteredTokens = tokenProfiles?.filter(token => 
-    (!selectedChain || token.chainId === selectedChain) &&
-    (!searchTerm || token.description?.toLowerCase().includes(searchTerm.toLowerCase()))
+  const filteredPairs = data?.pairs?.filter(pair => 
+    (!selectedChain || pair.chainId === selectedChain) &&
+    (!searchTerm || 
+      pair.baseToken.symbol.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      pair.quoteToken.symbol.toLowerCase().includes(searchTerm.toLowerCase()))
   ) || [];
 
   return (
@@ -62,21 +70,41 @@ const DEXScreener = () => {
       </div>
 
       {isLoading ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {[...Array(6)].map((_, index) => (
-            <Skeleton key={index} className="h-40 w-full bg-gray-800" />
+        <div className="space-y-4">
+          {[...Array(5)].map((_, index) => (
+            <Skeleton key={index} className="h-20 w-full bg-gray-800" />
           ))}
         </div>
       ) : error ? (
         <div className="text-red-500">Error: {error.message}</div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {filteredTokens.map((token, index) => (
-            <div key={index} className="bg-gray-800 p-4 rounded-lg">
-              <img src={token.icon} alt={token.description} className="w-12 h-12 mb-2 rounded-full" />
-              <h3 className="text-lg font-semibold mb-2">{token.description}</h3>
-              <p className="text-sm text-gray-400 mb-2">Chain: {token.chainId}</p>
-              <a href={token.url} target="_blank" rel="noopener noreferrer" className="text-blue-400 hover:text-blue-300">
+        <div className="space-y-4">
+          {filteredPairs.map((pair, index) => (
+            <div key={pair.pairAddress} className="bg-gray-800 p-4 rounded-lg flex flex-col md:flex-row justify-between items-start md:items-center">
+              <div className="flex items-center mb-2 md:mb-0">
+                <span className="text-lg font-semibold mr-4">#{index + 1}</span>
+                <div>
+                  <h3 className="text-lg font-semibold">{pair.baseToken.symbol}/{pair.quoteToken.symbol}</h3>
+                  <p className="text-sm text-gray-400">Chain: {pair.chainId}</p>
+                </div>
+              </div>
+              <div className="flex flex-col items-end">
+                <p className="text-lg font-semibold">${parseFloat(pair.priceUsd).toFixed(6)}</p>
+                <p className={`text-sm ${pair.priceChange.h24 >= 0 ? 'text-green-500' : 'text-red-500'}`}>
+                  {pair.priceChange.h24 >= 0 ? <ArrowUpIcon className="inline w-4 h-4 mr-1" /> : <ArrowDownIcon className="inline w-4 h-4 mr-1" />}
+                  {Math.abs(pair.priceChange.h24).toFixed(2)}%
+                </p>
+              </div>
+              <div className="flex flex-col items-end mt-2 md:mt-0">
+                <p className="text-sm">Volume 24h: ${formatNumber(pair.volume.h24)}</p>
+                <p className="text-sm">Liquidity: ${formatNumber(pair.liquidity.usd)}</p>
+              </div>
+              <a 
+                href={`https://dexscreener.com/${pair.chainId}/${pair.pairAddress}`} 
+                target="_blank" 
+                rel="noopener noreferrer" 
+                className="mt-2 md:mt-0 text-blue-400 hover:text-blue-300"
+              >
                 View on DEXScreener
               </a>
             </div>

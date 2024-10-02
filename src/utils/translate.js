@@ -29,7 +29,7 @@ const translations = {
     seeLess: "Arag wax yar",
     price: "Qiimaha",
     marketCap: "Suuqa Xaddiga",
-    change24h: "Isbeddelka 24h",
+    change24h: "24h %",
     links: "Link-yada",
     website: "Website",
     twitter: "Twitter",

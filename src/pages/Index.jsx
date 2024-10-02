@@ -53,33 +53,6 @@ const SkeletonRow = () => (
   </div>
 );
 
-const translations = {
-  en: {
-    search: "Search cryptocurrencies...",
-    name: "Name",
-    price: "Price",
-    change24h: "24h %",
-    marketCap: "Market Cap",
-    volume: "Volume(24h)",
-    circulatingSupply: "Circulating Supply",
-    footer: "© 2024 KriptoMarket. All rights reserved.",
-    empowering: "Empowering your crypto journey with trust and transparency.",
-    builtBy: "Built with 💙 by",
-  },
-  so: {
-    search: "Raadi cryptocurrencies...",
-    name: "Magac",
-    price: "Qiimo",
-    change24h: "24h %",
-    marketCap: "Suuqa Xaddiga",
-    volume: "Xaddiga(24h)",
-    circulatingSupply: "Sarifka Wareegaya",
-    footer: "© 2024 KriptoMarket. Dhammaan xuquuqda way dhowran tahay.",
-    empowering: "Awood u siinaya safarka crypto-gaaga iyadoo lagu kalsoon yahay oo la daahfurayo.",
-    builtBy: "Waxaa sameeyay 💙",
-  }
-};
-
 const Index = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [activeCategory, setActiveCategory] = useState('all');
@@ -87,7 +60,7 @@ const Index = () => {
   const { data, isLoading, error, refetch } = useQuery({
     queryKey: ['allAssets'],
     queryFn: fetchAllAssets,
-    refetchInterval: 120000,
+    refetchInterval: 120000, // Refetch every 2 minutes
     retry: 3,
     onError: (error) => {
       toast.error(`Failed to fetch data: ${error.message}. Please try again later.`);
@@ -139,7 +112,7 @@ const Index = () => {
               Array(20).fill().map((_, index) => <SkeletonRow key={index} />)
             ) : error ? (
               <div className="col-span-full text-center text-xl md:text-2xl font-bold mt-10 text-red-600">
-                Error: Unable to fetch data.
+                Error: Unable to fetch data. <button onClick={() => refetch()} className="text-blue-500 underline">Try again</button>
               </div>
             ) : (
               filteredAssets.map((asset) => <CoinListItem key={asset.id} asset={asset} />)

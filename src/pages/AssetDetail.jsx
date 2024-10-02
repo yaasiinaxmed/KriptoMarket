@@ -8,6 +8,7 @@ import AssetLinks from '../components/AssetLinks';
 import AssetDescription from '../components/AssetDescription';
 import PriceChart from '../components/PriceChart';
 import LanguageSwitcher from '../components/LanguageSwitcher';
+import { translate, translateDescription } from '../utils/translate';
 
 const fetchAssetData = async (id) => {
   const [assetResponse, exchangesResponse] = await Promise.all([
@@ -52,29 +53,6 @@ const fetchAssetData = async (id) => {
   assetData.tickers = uniqueTickers;
 
   return assetData;
-};
-
-const translations = {
-  en: {
-    backToList: "Back to list",
-    footer: "© 2024 KriptoMarket. All rights reserved.",
-    empowering: "Empowering your crypto journey with trust and transparency.",
-    builtBy: "Built with 💙 by",
-  },
-  so: {
-    backToList: "Ku noqo liiska",
-    footer: "© 2024 KriptoMarket. Dhammaan xuquuqda way dhowran tahay.",
-    empowering: "Awood u siinaya safarka crypto-gaaga iyadoo lagu kalsoon yahay oo la daahfurayo.",
-    builtBy: "Waxaa sameeyay 💙",
-  }
-};
-
-const translateDescription = (description, language) => {
-  if (language === 'en') return description;
-  
-  // This is a placeholder translation. In a real-world scenario, you would use a proper translation API or service.
-  const somaliPlaceholder = "Faahfaahin ku saabsan lacagta crypto ayaa lagu bixin doonaa halkan marka la helo tarjumaad sax ah.";
-  return somaliPlaceholder;
 };
 
 const AssetDetailContent = ({ asset, language }) => (
@@ -162,14 +140,12 @@ const AssetDetail = () => {
     }
   }, [asset]);
 
-  const t = translations[language];
-
   return (
     <div className="min-h-screen bg-gray-900 p-4 md:p-6 lg:p-8 flex flex-col">
       <LanguageSwitcher currentLanguage={language} onLanguageChange={setLanguage} />
       <div className="flex-grow">
         <Link to="/" className="inline-flex items-center text-white mb-6 hover:underline">
-          <ArrowLeftIcon className="mr-2" /> {t.backToList}
+          <ArrowLeftIcon className="mr-2" /> {translate('backToList', language)}
         </Link>
         {isLoading ? (
           <AssetDetailSkeleton />
@@ -181,10 +157,10 @@ const AssetDetail = () => {
       </div>
       <footer className="mt-8 bg-gray-800 rounded-lg py-6 text-white">
         <div className="container mx-auto text-center">
-          <p className="text-sm mb-4">{t.footer}</p>
-          <p className="mb-4">{t.empowering}</p>
+          <p className="text-sm mb-4">{translate('footer', language)}</p>
+          <p className="mb-4">{translate('empowering', language)}</p>
           <p>
-            {t.builtBy}
+            {translate('builtBy', language)}
             <a
               href="https://github.com/yaasiinaxmed"
               target="_blank"

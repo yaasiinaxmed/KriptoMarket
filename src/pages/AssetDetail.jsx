@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { ArrowLeftIcon } from 'lucide-react';
@@ -7,6 +7,7 @@ import AssetInfo from '../components/AssetInfo';
 import AssetLinks from '../components/AssetLinks';
 import AssetDescription from '../components/AssetDescription';
 import PriceChart from '../components/PriceChart';
+import LanguageSwitcher from '../components/LanguageSwitcher';
 
 const fetchAssetData = async (id) => {
   const [assetResponse, exchangesResponse] = await Promise.all([
@@ -23,7 +24,6 @@ const fetchAssetData = async (id) => {
     exchangesResponse.json()
   ]);
 
-  // Create a map of exchange id to logo and type (CEX/DEX)
   const exchangeMap = Object.fromEntries(
     exchangesData.map(exchange => [
       exchange.id,
@@ -34,7 +34,6 @@ const fetchAssetData = async (id) => {
     ])
   );
 
-  // Filter and deduplicate tickers
   const uniqueTickers = [];
   const seenExchanges = new Set();
 
@@ -55,15 +54,30 @@ const fetchAssetData = async (id) => {
   return assetData;
 };
 
-const AssetDetailContent = ({ asset }) => (
+const translations = {
+  en: {
+    backToList: "Back to list",
+    footer: "© 2024 KriptoMarket. All rights reserved.",
+    empowering: "Empowering your crypto journey with trust and transparency.",
+    builtBy: "Built with 💙 by",
+  },
+  so: {
+    backToList: "Ku noqo liiska",
+    footer: "© 2024 KriptoMarket. Dhammaan xuquuqda way dhowran tahay.",
+    empowering: "Awood u siinaya safarka crypto-gaaga iyadoo lagu kalsoon yahay oo la daahfurayo.",
+    builtBy: "Waxaa sameeyay 💙",
+  }
+};
+
+const AssetDetailContent = ({ asset, language }) => (
   <div className='flex flex-col lg:flex-row gap-6'>
     <div className="flex flex-col gap-6 w-full lg:w-[40%]">
       <div className="bg-gray-800 rounded-lg p-6">
-        <AssetInfo asset={asset} />
-        <AssetLinks asset={asset} />
+        <AssetInfo asset={asset} language={language} />
+        <AssetLinks asset={asset} language={language} />
       </div>
       <div className="bg-gray-800 rounded-lg p-6">
-        <AssetDescription description={asset.description.en} />
+        <AssetDescription description={asset.description.en} language={language} />
       </div>
     </div>
     <div className="bg-gray-800 rounded-lg p-3 w-full lg:w-[60%] h-[500px] md:h-[600px] lg:h-[700px]">
@@ -103,6 +117,7 @@ const AssetDetailSkeleton = () => (
 
 const AssetDetail = () => {
   const { id } = useParams();
+  const [language, setLanguage] = useState('en');
   const { data: asset, isLoading, error } = useQuery({
     queryKey: ['assetDetail', id],
     queryFn: () => fetchAssetData(id),
@@ -136,26 +151,29 @@ const AssetDetail = () => {
     }
   }, [asset]);
 
+  const t = translations[language];
+
   return (
     <div className="min-h-screen bg-gray-900 p-4 md:p-6 lg:p-8 flex flex-col">
+      <LanguageSwitcher currentLanguage={language} onLanguageChange={setLanguage} />
       <div className="flex-grow">
         <Link to="/" className="inline-flex items-center text-white mb-6 hover:underline">
-          <ArrowLeftIcon className="mr-2" /> Back to list
+          <ArrowLeftIcon className="mr-2" /> {t.backToList}
         </Link>
         {isLoading ? (
           <AssetDetailSkeleton />
         ) : error ? (
           <div className="text-center text-xl md:text-2xl font-bold mt-10 text-red-600">Error: {error.message}</div>
         ) : (
-          <AssetDetailContent asset={asset} />
+          <AssetDetailContent asset={asset} language={language} />
         )}
       </div>
       <footer className="mt-8 bg-gray-800 rounded-lg py-6 text-white">
         <div className="container mx-auto text-center">
-          <p className="text-sm mb-4">© 2024 KriptoMarket. All rights reserved.</p>
-          <p className="mb-4">Empowering your crypto journey with trust and transparency.</p>
+          <p className="text-sm mb-4">{t.footer}</p>
+          <p className="mb-4">{t.empowering}</p>
           <p>
-            Built with 💙 by
+            {t.builtBy}
             <a
               href="https://github.com/yaasiinaxmed"
               target="_blank"

@@ -8,7 +8,6 @@ import AssetLinks from '../components/AssetLinks';
 import AssetDescription from '../components/AssetDescription';
 import PriceChart from '../components/PriceChart';
 import LanguageSwitcher from '../components/LanguageSwitcher';
-import { translate } from '../utils/translate';
 
 const fetchAssetData = async (id) => {
   const [assetResponse, exchangesResponse] = await Promise.all([
@@ -70,38 +69,33 @@ const translations = {
   }
 };
 
-const AssetDetailContent = ({ asset, language }) => {
-  const [translatedDescription, setTranslatedDescription] = useState(asset.description.en);
+const translateDescription = (description, language) => {
+  if (language === 'en') return description;
+  
+  // This is a placeholder translation. In a real-world scenario, you would use a proper translation API or service.
+  const somaliPlaceholder = "Faahfaahin ku saabsan lacagta crypto ayaa lagu bixin doonaa halkan marka la helo tarjumaad sax ah.";
+  return somaliPlaceholder;
+};
 
-  useEffect(() => {
-    const translateDescription = async () => {
-      const translated = await translate(asset.description.en, language);
-      setTranslatedDescription(translated);
-    };
-
-    translateDescription();
-  }, [asset.description.en, language]);
-
-  return (
-    <div className='flex flex-col lg:flex-row gap-6'>
-      <div className="flex flex-col gap-6 w-full lg:w-[40%]">
-        <div className="bg-gray-800 rounded-lg p-6">
-          <AssetInfo asset={asset} language={language} />
-          <AssetLinks asset={asset} language={language} />
-        </div>
-        <div className="bg-gray-800 rounded-lg p-6">
-          <AssetDescription 
-            description={translatedDescription} 
-            language={language} 
-          />
-        </div>
+const AssetDetailContent = ({ asset, language }) => (
+  <div className='flex flex-col lg:flex-row gap-6'>
+    <div className="flex flex-col gap-6 w-full lg:w-[40%]">
+      <div className="bg-gray-800 rounded-lg p-6">
+        <AssetInfo asset={asset} language={language} />
+        <AssetLinks asset={asset} language={language} />
       </div>
-      <div className="bg-gray-800 rounded-lg p-3 w-full lg:w-[60%] h-[500px] md:h-[600px] lg:h-[700px]">
-        <PriceChart symbol={asset.symbol} />
+      <div className="bg-gray-800 rounded-lg p-6">
+        <AssetDescription 
+          description={translateDescription(asset.description.en, language)} 
+          language={language} 
+        />
       </div>
     </div>
-  );
-};
+    <div className="bg-gray-800 rounded-lg p-3 w-full lg:w-[60%] h-[500px] md:h-[600px] lg:h-[700px]">
+      <PriceChart symbol={asset.symbol} />
+    </div>
+  </div>
+);
 
 const AssetDetailSkeleton = () => (
   <div className='flex flex-col lg:flex-row gap-6'>

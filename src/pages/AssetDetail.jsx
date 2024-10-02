@@ -69,6 +69,14 @@ const translations = {
   }
 };
 
+const translateDescription = (description, language) => {
+  if (language === 'en') return description;
+  
+  // This is a placeholder translation. In a real-world scenario, you would use a proper translation API or service.
+  const somaliPlaceholder = "Faahfaahin ku saabsan lacagta crypto ayaa lagu bixin doonaa halkan marka la helo tarjumaad sax ah.";
+  return somaliPlaceholder;
+};
+
 const AssetDetailContent = ({ asset, language }) => (
   <div className='flex flex-col lg:flex-row gap-6'>
     <div className="flex flex-col gap-6 w-full lg:w-[40%]">
@@ -77,7 +85,10 @@ const AssetDetailContent = ({ asset, language }) => (
         <AssetLinks asset={asset} language={language} />
       </div>
       <div className="bg-gray-800 rounded-lg p-6">
-        <AssetDescription description={asset.description.en} language={language} />
+        <AssetDescription 
+          description={translateDescription(asset.description.en, language)} 
+          language={language} 
+        />
       </div>
     </div>
     <div className="bg-gray-800 rounded-lg p-3 w-full lg:w-[60%] h-[500px] md:h-[600px] lg:h-[700px]">

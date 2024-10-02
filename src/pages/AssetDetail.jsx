@@ -8,7 +8,7 @@ import AssetLinks from '../components/AssetLinks';
 import AssetDescription from '../components/AssetDescription';
 import PriceChart from '../components/PriceChart';
 import LanguageSwitcher from '../components/LanguageSwitcher';
-import { translate, translateDescription } from '../utils/translate';
+import { translate, translateDescription, getStoredLanguage, setStoredLanguage } from '../utils/translate';
 
 const fetchAssetData = async (id) => {
   const [assetResponse, exchangesResponse] = await Promise.all([
@@ -106,12 +106,20 @@ const AssetDetailSkeleton = () => (
 
 const AssetDetail = () => {
   const { id } = useParams();
-  const [language, setLanguage] = useState('en');
+  const [language, setLanguage] = useState(getStoredLanguage());
   const { data: asset, isLoading, error } = useQuery({
     queryKey: ['assetDetail', id],
     queryFn: () => fetchAssetData(id),
     refetchInterval: 60000,
   });
+
+  useEffect(() => {
+    setStoredLanguage(language);
+  }, [language]);
+
+  const handleLanguageChange = (newLanguage) => {
+    setLanguage(newLanguage);
+  };
 
   useEffect(() => {
     if (asset) {
@@ -126,7 +134,7 @@ const AssetDetail = () => {
           timezone: "Etc/UTC",
           theme: "dark",
           style: "1",
-          locale: "en",
+          locale: language,
           toolbar_bg: "#f1f3f6",
           enable_publishing: false,
           allow_symbol_change: true,
@@ -138,11 +146,11 @@ const AssetDetail = () => {
         document.body.removeChild(script);
       };
     }
-  }, [asset]);
+  }, [asset, language]);
 
   return (
     <div className="min-h-screen bg-gray-900 p-4 md:p-6 lg:p-8 flex flex-col">
-      <LanguageSwitcher currentLanguage={language} onLanguageChange={setLanguage} />
+      <LanguageSwitcher currentLanguage={language} onLanguageChange={handleLanguageChange} />
       <div className="flex-grow">
         <Link to="/" className="inline-flex items-center text-white mb-6 hover:underline">
           <ArrowLeftIcon className="mr-2" /> {translate('backToList', language)}

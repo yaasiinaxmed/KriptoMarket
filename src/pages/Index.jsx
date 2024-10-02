@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { ArrowDownIcon, ArrowUpIcon, Flame, SearchIcon, TrendingUpIcon } from 'lucide-react';
 import { Skeleton } from "@/components/ui/skeleton";
@@ -7,6 +7,7 @@ import CoinListItem from '../components/CoinListItem';
 import { toast } from "sonner";
 import { Link } from 'react-router-dom';
 import LanguageSwitcher from '../components/LanguageSwitcher';
+import { translate, getStoredLanguage, setStoredLanguage } from '../utils/translate';
 
 const fetchAllAssets = async () => {
   try {
@@ -56,7 +57,7 @@ const SkeletonRow = () => (
 const Index = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [activeCategory, setActiveCategory] = useState('all');
-  const [language, setLanguage] = useState('en');
+  const [language, setLanguage] = useState(getStoredLanguage());
   const { data, isLoading, error, refetch } = useQuery({
     queryKey: ['allAssets'],
     queryFn: fetchAllAssets,
@@ -67,6 +68,10 @@ const Index = () => {
     },
   });
 
+  useEffect(() => {
+    setStoredLanguage(language);
+  }, [language]);
+
   const filteredAssets = data
     ? data.filter(asset =>
       (asset.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -75,21 +80,23 @@ const Index = () => {
     )
     : [];
 
-  const t = translations[language];
+  const handleLanguageChange = (newLanguage) => {
+    setLanguage(newLanguage);
+  };
 
   return (
     <div className="min-h-screen bg-gray-900 p-4 md:p-8 flex flex-col">
-      <LanguageSwitcher currentLanguage={language} onLanguageChange={setLanguage} />
+      <LanguageSwitcher currentLanguage={language} onLanguageChange={handleLanguageChange} />
       <div className="flex-grow">
         <div className="mb-6 md:mb-8 flex flex-col items-center justify-center gap-4">
           <img src="./logo.png" alt="Kriptomarket Logo" className="w-[15rem] sm:w-[20rem]" />
-          <p className='text-center'>{t.empowering}</p>
+          <p className='text-center'>{translate('empowering', language)}</p>
         </div>
         <div className="mb-4 md:mb-6 flex justify-center">
           <div className="relative w-full md:w-96">
             <input
               type="text"
-              placeholder={t.search}
+              placeholder={translate('search', language)}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="w-full px-4 py-2 rounded-full bg-gray-800 text-white border-2 md:border-2 border-white focus:outline-none"
@@ -101,18 +108,18 @@ const Index = () => {
         <div className="overflow-x-auto">
           <div className="min-w-full">
             <div className="grid grid-cols-4 md:grid-cols-5 lg:grid-cols-7 gap-2 md:gap-4 items-center py-2 md:py-4 px-2 md:px-4 bg-gray-800 font-bold text-xs md:text-sm">
-              <div className="col-span-2">{t.name}</div>
-              <div className="text-right">{t.price}</div>
-              <div className="text-right">{t.change24h}</div>
-              <div className="text-right hidden md:block">{t.marketCap}</div>
-              <div className="text-right hidden md:block">{t.volume}</div>
-              <div className="text-right hidden lg:block">{t.circulatingSupply}</div>
+              <div className="col-span-2">{translate('name', language)}</div>
+              <div className="text-right">{translate('price', language)}</div>
+              <div className="text-right">{translate('change24h', language)}</div>
+              <div className="text-right hidden md:block">{translate('marketCap', language)}</div>
+              <div className="text-right hidden md:block">{translate('volume', language)}</div>
+              <div className="text-right hidden lg:block">{translate('circulatingSupply', language)}</div>
             </div>
             {isLoading ? (
               Array(20).fill().map((_, index) => <SkeletonRow key={index} />)
             ) : error ? (
               <div className="col-span-full text-center text-xl md:text-2xl font-bold mt-10 text-red-600">
-                Error: Unable to fetch data. <button onClick={() => refetch()} className="text-blue-500 underline">Try again</button>
+                Error: Unable to fetch data. <button onClick={() => refetch()} className="text-blue-500 underline">{translate('tryAgain', language)}</button>
               </div>
             ) : (
               filteredAssets.map((asset) => <CoinListItem key={asset.id} asset={asset} />)
@@ -122,10 +129,10 @@ const Index = () => {
       </div>
       <footer className="mt-8 bg-gray-800 rounded-lg py-6 text-white">
         <div className="container mx-auto text-center">
-          <p className="text-sm mb-4">{t.footer}</p>
-          <p className="mb-4">{t.empowering}</p>
+          <p className="text-sm mb-4">{translate('footer', language)}</p>
+          <p className="mb-4">{translate('empowering', language)}</p>
           <p>
-            {t.builtBy}
+            {translate('builtBy', language)}
             <a
               href="https://github.com/yaasiinaxmed"
               target="_blank"

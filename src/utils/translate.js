@@ -16,6 +16,11 @@ const translations = {
     footer: "© 2024 KriptoMarket. All rights reserved.",
     empowering: "Empowering your crypto journey with trust and transparency.",
     builtBy: "Built with 💙 by",
+    name: "Name",
+    volume: "Volume",
+    circulatingSupply: "Circulating Supply",
+    search: "Search coins...",
+    tryAgain: "Try again",
   },
   so: {
     backToList: "Ku noqo liiska",
@@ -34,7 +39,20 @@ const translations = {
     footer: "© 2024 KriptoMarket. Dhammaan xuquuqda way dhowran tahay.",
     empowering: "Awood u siinaya safarka crypto-gaaga iyadoo lagu kalsoon yahay oo la daahfurayo.",
     builtBy: "Waxaa sameeyay 💙",
+    name: "Magaca",
+    volume: "Xaddiga",
+    circulatingSupply: "Sarifka Wareegaya",
+    search: "Raadi lacagaha...",
+    tryAgain: "Isku day mar kale",
   }
+};
+
+export const getStoredLanguage = () => {
+  return localStorage.getItem('language') || 'en';
+};
+
+export const setStoredLanguage = (lang) => {
+  localStorage.setItem('language', lang);
 };
 
 export const translate = (key, language) => {
